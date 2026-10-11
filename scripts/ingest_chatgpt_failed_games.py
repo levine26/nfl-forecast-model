@@ -229,6 +229,129 @@ def _run(repo_root: Path, args: list[str]) -> None:
     subprocess.run([sys.executable, *args], cwd=repo_root, check=True)
 
 
+def _recovery_category(reason: str) -> str:
+    """Map a validator message to an actionable, game-scoped repair class."""
+    text = reason.lower()
+    if any(term in text for term in ("source", "article", "url", "publisher", "reporting")):
+        return "source_research"
+    if any(term in text for term in ("team", "player", "coach", "roster", "prediction row")):
+        return "factual_or_identity"
+    if any(term in text for term in ("paragraph", "headline", "tactical", "editorial quality", "seven-word", "generic")):
+        return "editorial_quality"
+    if any(term in text for term in ("json", "object", "field", "rationale", "length")):
+        return "structural"
+    return "technical"
+
+
+def _recovery_error_records(game_id: str, detail: str) -> list[dict[str, str]]:
+    """Retain all validator failures rather than reporting only the first failed game."""
+    marker = "Focused editorial game validation failed:"
+    raw = str(detail or "").strip()
+    if marker in raw:
+        raw = raw.rsplit(marker, 1)[-1].splitlines()[0].strip()
+    parts = [part.strip() for part in raw.split("; ") if part.strip()] or ["Validator exited without diagnostics"]
+    errors = []
+    for part in parts:
+        reason = part.removeprefix(f"{game_id}: ").strip()
+        category = _recovery_category(reason)
+        errors.append({
+            "game_id": game_id,
+            "failing_field": (
+                "sources" if category == "source_research" else
+                "paragraph1" if category == "editorial_quality" else
+                "game_identity" if category == "factual_or_identity" else
+                "payload" 
+            ),
+            "validation_rule": reason.split(": ", 1)[0][:120],
+            "relevant_evidence": "",
+            "rejection_reason": reason[:1000],
+            "suggested_repair_category": category,
+        })
+    return errors
+
+
+def _write_recovery_report(path: Path, report: dict[str, Any]) -> None:
+    """Atomically persist a complete per-game diagnostic even on rejected slates."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    staged = path.with_name(path.name + ".tmp")
+    staged.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    staged.replace(path)
+
+
+def _validate_recovery_targets(
+    *,
+    repo_root: Path,
+    input_root: Path,
+    prediction_path: Path,
+    accepted: Path,
+    targets: list[str],
+    report_path: Path,
+) -> dict[str, dict[str, Any]]:
+    """Check EVERY recovery target; never leak rejected candidates into accepted-dir.
+
+    The focused validator uses accepted-dir for cross-game uniqueness. Only accepted
+    normalized responses enter that directory, so a rejected candidate cannot poison
+    later independent game evaluations. No production artifact is written here.
+    """
+    candidate_dir = accepted.parent / "candidates"
+    candidate_dir.mkdir()
+    entries: dict[str, dict[str, Any]] = {}
+    diagnostics: dict[str, dict[str, Any]] = {}
+    for gid in targets:
+        staged = candidate_dir / f"{gid}.txt"
+        shutil.copyfile(input_root / f"{gid}.json", staged)
+        args = [
+            "scripts/validate_single_copilot_game.py",
+            "--input", str(staged),
+            "--game-id", gid,
+            "--predictions", str(prediction_path),
+            "--accepted-dir", str(accepted),
+        ]
+        try:
+            result = subprocess.run(
+                [sys.executable, *args],
+                cwd=repo_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            stdout = str(result.stdout or "").strip()
+            if stdout:
+                print(stdout, flush=True)
+            payload = json.loads(staged.read_text(encoding="utf-8"))
+            entry = payload["games"][gid]
+            if not isinstance(entry, dict):
+                raise ValueError("normalized accepted payload must contain an object")
+            shutil.copyfile(staged, accepted / f"{gid}.txt")
+            entries[gid] = entry
+            diagnostics[gid] = {"state": "accepted", "errors": []}
+            print(f"accepted recovery candidate {gid}", flush=True)
+        except (subprocess.CalledProcessError, OSError, ValueError, KeyError, TypeError) as exc:
+            detail = str(getattr(exc, "stderr", "") or getattr(exc, "output", "") or exc)
+            errors = _recovery_error_records(gid, detail)
+            diagnostics[gid] = {"state": "rejected", "errors": errors}
+            print(f"rejected recovery candidate {gid}: {detail}", file=sys.stderr, flush=True)
+
+    report = {
+        "schema_version": 1,
+        "validation_stage": "independent_focused_games",
+        "games_expected": len(targets),
+        "games_accepted": len(entries),
+        "games_rejected": len(targets) - len(entries),
+        "games": diagnostics,
+        "publication_authorized": False,
+    }
+    _write_recovery_report(report_path, report)
+    if len(entries) != len(targets):
+        rejected = [gid for gid, item in diagnostics.items() if item["state"] == "rejected"]
+        raise ValueError(
+            "Failed-game editorial validation rejected "
+            f"{len(rejected)}/{len(targets)} games: {', '.join(rejected)}. "
+            f"Complete diagnostics: {report_path}"
+        )
+    return entries
+
+
 def ingest(
     *,
     input_dir: Path,
@@ -267,21 +390,14 @@ def ingest(
         accepted.mkdir()
         chatgpt_entries: dict[str, dict[str, Any]] = {}
 
-        for gid in targets:
-            staged = accepted / f"{gid}.txt"
-            shutil.copyfile(input_root / f"{gid}.json", staged)
-            _run(repo_root, [
-                "scripts/validate_single_copilot_game.py",
-                "--input", str(staged),
-                "--game-id", gid,
-                "--predictions", str(prediction_path),
-                "--accepted-dir", str(accepted),
-            ])
-            # Focused validation normalizes accepted payloads to strict JSON, so no
-            # permissive provider parser is needed here. This also keeps the module
-            # import-safe when tests load it outside the scripts directory.
-            payload = json.loads(staged.read_text(encoding="utf-8"))
-            chatgpt_entries[gid] = payload["games"][gid]
+        chatgpt_entries = _validate_recovery_targets(
+            repo_root=repo_root,
+            input_root=input_root,
+            prediction_path=prediction_path,
+            accepted=accepted,
+            targets=targets,
+            report_path=resolve(Path("outputs/editorial_recovery_diagnostics.json")),
+        )
 
         raw = work / "mixed-raw.json"
         composed = work / "composed.json"
@@ -318,6 +434,14 @@ def ingest(
             "--predictions", str(prediction_path),
             "--output", str(output_path),
         ])
+
+    # Mark publication eligibility only after full-slate composition and validation.
+    diagnostic_path = resolve(Path("outputs/editorial_recovery_diagnostics.json"))
+    if diagnostic_path.is_file():
+        report = json.loads(diagnostic_path.read_text(encoding="utf-8"))
+        report["publication_authorized"] = True
+        report["validation_stage"] = "full_slate_validated"
+        _write_recovery_report(diagnostic_path, report)
 
     updated_status = mark_chatgpt_recovered(status, targets)
     context_status_path.write_text(json.dumps(updated_status, indent=2, sort_keys=True) + "\n", encoding="utf-8")
