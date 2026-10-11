@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Read-only freshness gate for the independent official T-120 lock worker.
+"""Read-only freshness gate for the independent versioned official lock worker.
 
 When the latest *published* frozen F-ST snapshot is too old to be eligible,
 request the existing market refresh before attempting a lock. This script
@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.pregame_due import kickoff_utc
+from nfl_forecast.lock_policy import official_lock_target_minutes
 
 MAX_AGE_MINUTES = 90.0
 LOCK_WINDOW_MINUTES = 120.0
@@ -68,7 +69,7 @@ def stale_due_games(
         except (KeyError, ValueError, TypeError) as exc:
             raise LockPreparationError(f"{gid}: invalid kickoff") from exc
         minutes_to_kickoff = (kickoff - now).total_seconds() / 60.0
-        if not 0.0 < minutes_to_kickoff <= LOCK_WINDOW_MINUTES:
+        if not 0.0 < minutes_to_kickoff <= official_lock_target_minutes(row):
             continue
 
         generated = _timestamp(row.get("prediction_timestamp_utc"))
