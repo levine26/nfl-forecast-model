@@ -179,6 +179,8 @@ jobs:
 
       - name: Finalize and enforce full-slate launch gate
         if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
+        env:
+          SUNDAY_SIGNAL_REVIEW_KEY: ${{ secrets.SUNDAY_SIGNAL_REVIEW_KEY }}
         run: |
           python scripts/finalize_editorial.py
           python - <<'PY'
@@ -197,6 +199,9 @@ jobs:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
           from scripts.verify_human_source_acceptance import require_verified_human_sources
           require_verified_human_sources(status, games_expected=games)
+          # Status booleans and publisher URL checks are not trusted factual approvals.
+          from scripts.editorial_signed_acceptance import require_signed_claim_receipts
+          require_signed_claim_receipts()
           print('ChatGPT ingestion matchup/model/pick launch gate passed:', games, 'games')
           PY
 
