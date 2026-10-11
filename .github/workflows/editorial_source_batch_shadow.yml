@@ -5,6 +5,8 @@ on:
     paths:
       - "scripts/audit_editorial_sources_shadow.py"
       - "tests/test_editorial_source_batch_shadow.py"
+      - "scripts/audit_editorial_slate_shadow.py"
+      - "tests/test_editorial_slate_shadow_audit.py"
       - ".github/workflows/editorial_source_batch_shadow.yml"
   workflow_dispatch:
 
@@ -27,7 +29,7 @@ jobs:
           PYTHONPATH: "src:."
         run: |
           python -m py_compile scripts/audit_editorial_sources_shadow.py
-          pytest -q tests/test_editorial_source_batch_shadow.py
+          pytest -q tests/test_editorial_source_batch_shadow.py tests/test_editorial_slate_shadow_audit.py
           python - <<'PY'
           from pathlib import Path
           script = Path("scripts/audit_editorial_sources_shadow.py").read_text()
@@ -40,6 +42,33 @@ jobs:
           PYTHONPATH: "src:."
         run: |
           python scripts/audit_editorial_sources_shadow.py --out /tmp/week5-article-audit-shadow.json
+      - name: Build independent claim review queue and full-slate editorial diagnostic
+        env:
+          PYTHONPATH: "src:."
+        run: |
+          python scripts/prepare_editorial_claim_review_shadow.py --out /tmp/week5-claim-review-queue-shadow.json
+          python scripts/audit_editorial_slate_shadow.py \
+            --source-receipts /tmp/week5-article-audit-shadow.json \
+            --claim-queue /tmp/week5-claim-review-queue-shadow.json \
+            --out /tmp/week5-full-slate-editorial-shadow.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('/tmp/week5-full-slate-editorial-shadow.json').read_text())
+          assert a['games_expected'] == a['games_audited'] == 15
+          assert a['source_snapshot_compatible']
+          assert a['claim_queue_snapshot_compatible']
+          assert a['games_with_independently_verified_human_reads'] == 0
+          assert a['editorial_publication_authorized'] is False
+          print('Per-game diagnostic for all 15 canonical games; no semantic fact-checking approval.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: week5-complete-editorial-diagnostic-shadow
+          path: |
+            /tmp/week5-full-slate-editorial-shadow.json
+            /tmp/week5-claim-review-queue-shadow.json
+          retention-days: 7
       - name: Upload provenance results without publisher article text
         uses: actions/upload-artifact@v4
         with:

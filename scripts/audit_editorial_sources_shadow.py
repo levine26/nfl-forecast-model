@@ -54,8 +54,11 @@ def audit_candidates(
         errors: list[str] = []
         reports: list[dict[str, Any]] = []
         sources_out: list[dict[str, Any]] = []
+        candidate_sha = None
         try:
-            data = json.loads((fallback_dir / f"{gid}.json").read_text(encoding="utf-8"))
+            candidate_bytes = (fallback_dir / f"{gid}.json").read_bytes()
+            candidate_sha = sha256(candidate_bytes).hexdigest()
+            data = json.loads(candidate_bytes)
             sources = data["games"][gid]["sources"]
             if not isinstance(sources, list) or not 2 <= len(sources) <= 4:
                 raise ValueError("two to four sources required")
@@ -94,6 +97,7 @@ def audit_candidates(
         except ArticleCaptureError as exc:
             errors.append(f"publisher_or_team_coverage:{exc}")
         games[gid] = {
+            "candidate_sha256": candidate_sha,
             "sources": sources_out,
             "errors": errors,
             "status": "provenance_ready_semantics_pending" if not errors else "source_blocked",
