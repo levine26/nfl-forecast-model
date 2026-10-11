@@ -86,11 +86,10 @@ test('missing preview is a pending Read, not an excuse to render templates',()=>
   assert.equal(hasPublishedHumanRead({headline:'An NFL preview',paragraphs:['a','b']},accepted(),15),false)
 })
 
-test('site must load independent acceptance and apply it to board, mobile and matchup reads',()=>{
+test('forecast-only website excludes matchup Reads and editorial acceptance payloads',()=>{
   const app=readFileSync(new URL('../src/AppSignal.jsx', import.meta.url),'utf8')
-  assert.match(app,/fetchJSON\('context_source_status\.json',\{\}\)/)
-  assert.match(app,/setEditorialAcceptance\(sourceStatusRows\?\.editorial_acceptance\|\|null\)/)
-  assert.match(app,/hasPublishedHumanRead\(preview,acceptance,expectedGames\)/)
-  assert.match(app,/<TheSignal preview=\{preview\} compact acceptance=\{acceptance\} expectedGames=\{expectedGames\}\/>/)
-  assert.match(app,/<TheSignal preview=\{preview\} acceptance=\{acceptance\} expectedGames=\{expectedGames\}\/>/)
+  assert.doesNotMatch(app,/fetchJSON\('context_source_status\.json'/)
+  assert.doesNotMatch(app,/fetchJSON\('game_previews\.json'/)
+  assert.doesNotMatch(app,/hasPublishedHumanRead/)
+  assert.doesNotMatch(app,/<TheSignal/)
 })
