@@ -34,7 +34,9 @@ def _team_city(code: str) -> str:
 
 
 def _mentions_team(value: object, code: str, *, opponent_code: str | None = None) -> bool:
-    full = str((TEAM_META.get(code) or {}).get("name") or code)
+    full = str((TEAM_META.get(code) or {}).get("name") or code).strip()
+    if not code or not full:
+        return False
     aliases = [full.lower(), full.split()[-1].lower()]
     city = _team_city(code)
     # Use city-only shorthand when unambiguous within the matchup.
