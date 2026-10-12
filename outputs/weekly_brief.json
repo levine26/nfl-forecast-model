@@ -1,6 +1,12 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_05_BUF_LA",
+      "largest_driver": "Market movement",
+      "pick": "LA",
+      "pick_delta_pp": 1.5607232447590658
+    },
+    {
       "game_id": "2026_04_ATL_NO",
       "largest_driver": "Market movement",
       "pick": "NO",
@@ -11,24 +17,18 @@
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
-    },
-    {
-      "game_id": "2026_04_KC_LV",
-      "largest_driver": "No material input move",
-      "pick": "KC",
-      "pick_delta_pp": -1.79001258260314e-10
     }
   ],
-  "generated_utc": "2026-10-12T22:12:06.626820+00:00",
+  "generated_utc": "2026-10-12T22:22:31.941496+00:00",
   "market_disagreements": [
     {
       "confidence": "Solid",
       "game_id": "2026_05_BUF_LA",
       "matchup": "BUF @ LA",
       "pick": "LA",
-      "pick_prob": 0.6196224226227844,
+      "pick_prob": 0.6352296550703751,
       "projected_score": "LA 23.2 \u2013 BUF 23.0",
-      "pure_market_gap_pp": 12.891759002523633
+      "pure_market_gap_pp": 14.214790739971377
     }
   ],
   "most_uncertain": [
@@ -37,7 +37,7 @@
       "game_id": "2026_05_BUF_LA",
       "matchup": "BUF @ LA",
       "pick": "LA",
-      "pick_prob": 0.6196224226227844,
+      "pick_prob": 0.6352296550703751,
       "projected_score": "LA 23.2 \u2013 BUF 23.0"
     }
   ],
@@ -47,7 +47,7 @@
       "game_id": "2026_05_BUF_LA",
       "matchup": "BUF @ LA",
       "pick": "LA",
-      "pick_prob": 0.6196224226227844,
+      "pick_prob": 0.6352296550703751,
       "projected_score": "LA 23.2 \u2013 BUF 23.0"
     }
   ],

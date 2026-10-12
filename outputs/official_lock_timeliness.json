@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 73,
-    "on_time": 3,
+    "on_time": 4,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -768,9 +768,19 @@
       "minutes_late_vs_target": 0.0709,
       "scheduled_lock_utc": "2026-10-11T22:20:00+00:00",
       "target_minutes_before_kickoff": 120.0
+    },
+    {
+      "actual_lock_utc": "2026-10-12T22:22:31.106631+00:00",
+      "classification": "on_time",
+      "game_id": "2026_05_BUF_LA",
+      "minutes_before_kickoff": 112.4816,
+      "minutes_late_vs_t120": 7.5184,
+      "minutes_late_vs_target": 7.5184,
+      "scheduled_lock_utc": "2026-10-12T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     }
   ],
-  "locked_count": 76,
+  "locked_count": 77,
   "official_lock_target_minutes": 120.0,
   "official_lock_targets_minutes": [
     120.0
