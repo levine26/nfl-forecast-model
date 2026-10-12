@@ -105,9 +105,18 @@ function receiptPick(row) {
   const hp=num(row.final_home_prob)
   return row.pick || (hp==null?'—':hp>=.5?row.home_team:row.away_team)
 }
+function isVerifiedRecoveredPregame(row) {
+  if (row?.lock_status !== 'RECOVERED_MISSED_LOCK' || !row.recovery_source_commit_sha) return false
+  const captured=Date.parse(row.recovery_source_prediction_timestamp_utc || '')
+  const kickoff=Date.parse(row.kickoff_utc || '')
+  return Number.isFinite(captured) && Number.isFinite(kickoff) && captured < kickoff
+}
+function isDisplayableHistoryRow(row) {
+  return row?.lock_status === 'LOCKED' || isVerifiedRecoveredPregame(row)
+}
 function finalScore(row) {
-  const home=num(row.final_home_score ?? row.home_score ?? row.result_home_score ?? row.score_home)
-  const away=num(row.final_away_score ?? row.away_score ?? row.result_away_score ?? row.score_away)
+  const home=num(row.actual_home_score ?? row.final_home_score ?? row.home_score ?? row.result_home_score ?? row.score_home)
+  const away=num(row.actual_away_score ?? row.final_away_score ?? row.away_score ?? row.result_away_score ?? row.score_away)
   return home==null || away==null ? null : {home,away}
 }
 function relativeFreshness(value) {
@@ -352,28 +361,31 @@ function PerformanceSummary({scoreboard}) {
 }
 function HistoryExplorer({history,autopsies,scoreboard}) {
   const locked=history.filter(row=>row.lock_status==='LOCKED'&&String(row.season||'2026')==='2026')
-  const weeks=[...new Set(locked.map(r=>r.week).filter(Boolean))].sort((a,b)=>Number(a)-Number(b))
+  const records=history.filter(row=>isDisplayableHistoryRow(row)&&String(row.season||'2026')==='2026')
+  const weeks=[...new Set(records.map(r=>r.week).filter(Boolean))].sort((a,b)=>Number(a)-Number(b))
   const [week,setWeek]=useState('all'),[tier,setTier]=useState('all'),[result,setResult]=useState('all')
-  const rows=locked.filter(row=>{
+  const rows=records.filter(row=>{
     const p=receiptProbability(row),t=signalTier(p).key,c=truthy(autopsies[row.game_id]?.winner_correct ?? autopsies[row.game_id]?.correct ?? row.winner_correct)
     return (week==='all'||String(row.week)===week)&&(tier==='all'||t===tier)&&(result==='all'||(result==='correct'&&c===true)||(result==='miss'&&c===false)||(result==='pending'&&c==null))
   })
   return <section className="ss-exp-history">
     <PerformanceSummary scoreboard={scoreboard}/>
     <Calibration rows={locked} autopsies={autopsies}/>
+    <p className="ss-exp-recovered-policy">Verified pre-kickoff snapshots recovered after a missed official lock are shown below with their original results, but excluded from official lock totals, calibration, and Brier scores.</p>
     <div className="ss-exp-history-toolbar"><label>Week<select value={week} onChange={e=>setWeek(e.target.value)}><option value="all">All</option>{weeks.map(w=><option key={w} value={String(w)}>{w}</option>)}</select></label><label>Tier<select value={tier} onChange={e=>setTier(e.target.value)}><option value="all">All</option><option value="strong">Strong signal</option><option value="signal">Signal</option><option value="lean">Lean</option><option value="watch">Watch</option></select></label><label>Result<select value={result} onChange={e=>setResult(e.target.value)}><option value="all">All</option><option value="correct">Correct</option><option value="miss">Miss</option><option value="pending">Pending</option></select></label></div>
-    {rows.length===0?<div className="ss-exp-empty"><b>No receipts match these filters.</b><span>Change a filter to inspect the immutable record.</span></div>:<div className="ss-exp-history-list">{rows.map(row=>{const p=receiptProbability(row),pick=receiptPick(row),correct=truthy(autopsies[row.game_id]?.winner_correct ?? autopsies[row.game_id]?.correct ?? row.winner_correct);return <button key={row.game_id} onClick={()=>nav(`receipt/${encodeURIComponent(row.game_id)}`)}><span>WEEK {row.week||'—'}</span><b>{row.away_team} @ {row.home_team}</b><strong>{pick} {pct(p)}</strong><span>{signalTier(p).label}</span><span>{row.lock_timestamp_utc?`Locked ${formatTime(row.lock_timestamp_utc)}`:'Locked pregame'}</span><em className={correct===true?'correct':correct===false?'miss':'pending'}>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</em><i>View receipt →</i></button>})}</div>}
+    {rows.length===0?<div className="ss-exp-empty"><b>No receipts match these filters.</b><span>Change a filter to inspect the immutable record.</span></div>:<div className="ss-exp-history-list">{rows.map(row=>{const p=receiptProbability(row),pick=receiptPick(row),correct=truthy(autopsies[row.game_id]?.winner_correct ?? autopsies[row.game_id]?.correct ?? row.winner_correct);return <button key={row.game_id} onClick={()=>nav(`receipt/${encodeURIComponent(row.game_id)}`)}><span>WEEK {row.week||'—'}</span><b>{row.away_team} @ {row.home_team}</b><strong>{pick} {pct(p)}</strong><span>{signalTier(p).label}</span><span>{isVerifiedRecoveredPregame(row)?'Recovered pregame · no official lock':row.lock_timestamp_utc?`Locked ${formatTime(row.lock_timestamp_utc)}`:'Locked pregame'}</span><em className={correct===true?'correct':correct===false?'miss':'pending'}>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</em><i>View receipt →</i></button>})}</div>}
   </section>
 }
 
 function ReceiptPage({row,autopsy}) {
   if (!row) return <main className="ss-exp-receipt-page"><button onClick={()=>nav('history')}>← Back to History</button><div className="ss-exp-empty"><b>This receipt is not available in the published history.</b><span>The archive only opens immutable picks that exist in the current public record.</span></div></main>
   const pick=receiptPick(row),p=receiptProbability(row),correct=truthy(autopsy?.winner_correct ?? autopsy?.correct ?? row.winner_correct),score=finalScore(row)
+  const recovered=isVerifiedRecoveredPregame(row)
   const text=autopsy?.summary||autopsy?.headline||autopsy?.analysis||autopsy?.takeaway
   return <main className="ss-exp-receipt-page">
-    <button onClick={()=>nav('history')}>← Back to Official History</button>
-    <section className="ss-exp-receipt-hero"><span>OFFICIAL PREGAME RECEIPT · WEEK {row.week||'—'}</span><h1>{row.away_team} @ {row.home_team}</h1><p>Published, locked before kickoff, and preserved after the result.</p></section>
-    <section className="ss-exp-receipt-grid"><article><small>PICK OF RECORD</small><img src={teamLogo(pick)} alt=""/><strong>{teamName(pick)}</strong><b>{pct(p)}</b></article><article><small>LOCKED</small><strong>{formatTime(row.lock_timestamp_utc,{withDay:true})}</strong><span>Later refreshes cannot replace this forecast.</span></article><article className={correct===true?'correct':correct===false?'miss':'pending'}><small>RESULT</small><strong>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</strong><span>{score?`${row.away_team} ${score.away} – ${row.home_team} ${score.home}`:'Final score not stored in this receipt.'}</span></article></section>
+    <button onClick={()=>nav('history')}>← Back to History</button>
+    <section className="ss-exp-receipt-hero"><span>{recovered?'RECOVERED PREGAME FORECAST':'OFFICIAL PREGAME RECEIPT'} · WEEK {row.week||'—'}</span><h1>{row.away_team} @ {row.home_team}</h1><p>{recovered?'Verified committed forecast captured before kickoff. The official lock was missed; this is not counted in the official locked-performance cohort.':'Published, locked before kickoff, and preserved after the result.'}</p></section>
+    <section className="ss-exp-receipt-grid"><article><small>{recovered?'PREGAME PICK':'PICK OF RECORD'}</small><img src={teamLogo(pick)} alt=""/><strong>{teamName(pick)}</strong><b>{pct(p)}</b></article><article><small>{recovered?'SOURCE SNAPSHOT':'LOCKED'}</small><strong>{formatTime(recovered?row.recovery_source_prediction_timestamp_utc:row.lock_timestamp_utc,{withDay:true})}</strong><span>{recovered?'Recovered from an immutable pre-kickoff commit; no official lock.':'Later refreshes cannot replace this forecast.'}</span></article><article className={correct===true?'correct':correct===false?'miss':'pending'}><small>RESULT</small><strong>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</strong><span>{score?`${row.away_team} ${score.away} – ${row.home_team} ${score.home}`:'Final score not stored in this receipt.'}</span></article></section>
     {text&&<section className="ss-exp-receipt-analysis"><span>POSTGAME AUTOPSY</span><h2>What the result taught us.</h2><p>{text}</p></section>}
   </main>
 }
@@ -408,7 +420,7 @@ export default function ExperienceLayer() {
   },[route.page])
   const game=route.page==='game'?data.games.find(g=>g.game_id===route.gameId):null
   const historyRow=game?data.history.find(r=>r.game_id===game.game_id&&r.lock_status==='LOCKED'):null
-  const receiptRow=route.page==='receipt'?data.history.find(r=>r.game_id===route.gameId&&r.lock_status==='LOCKED'):null
+  const receiptRow=route.page==='receipt'?data.history.find(r=>r.game_id===route.gameId&&isDisplayableHistoryRow(r)):null
   return <>
     <PresentationTextPass route={route}/>
     {route.page==='forecasts'&&<>
