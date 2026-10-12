@@ -4,7 +4,7 @@ const csv = [
   'game_id,season,week,away_team,home_team,pick,final_home_prob,expected_margin,spread_line,lock_status,recovery_source_commit_sha,recovery_source_prediction_timestamp_utc,kickoff_utc,winner_correct,actual_home_score,actual_away_score',
   '2026_05_PHI_JAX,2026,5,PHI,JAX,JAX,0.7729426227299359,10.699215207483226,8.5,RECOVERED_MISSED_LOCK,5f611ab21ab16db51c3e432740fba79c40d647fb,2026-10-11T07:47:30Z,2026-10-11T13:30:00Z,True,19,17',
   '2026_05_FAKE_MIA,2026,5,FAKE,MIA,MIA,0.70,3,1,RECOVERED_MISSED_LOCK,,2026-10-11T14:00:00Z,2026-10-11T13:30:00Z,True,20,14',
-].join('\\n') + '\\n'
+].join('\n') + '\n'
 
 test('verified missed-lock forecast is visible but excluded from official calibration', async ({page}) => {
   await page.route('**/data/prediction_history.csv', route => route.fulfill({status:200,contentType:'text/csv',body:csv}))
