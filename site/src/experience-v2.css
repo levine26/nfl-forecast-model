@@ -170,3 +170,6 @@ body.ss-exp-receipt .ss-board{display:none!important}
 .ss-exp-performance-cards small{font-size:11px;color:var(--ss-muted)}
 .ss-exp-performance>p{margin:14px 0 0;color:var(--ss-muted);font-size:11px;line-height:1.5}
 @media(max-width:768px){.ss-exp-performance>header{flex-direction:column}.ss-exp-performance-cards{grid-template-columns:1fr}}
+
+/* Recovered pregame snapshots appear in History, never in official performance totals. */
+.ss-exp-recovered-policy{margin:0 0 12px;font-size:11px;line-height:1.5;color:var(--ss-muted)}
