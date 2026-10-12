@@ -73,10 +73,10 @@ function ReceiptDetails({row}) {
       <small>{recovered?'Values from the verified pre-kickoff source; there was no official lock.':'Values below are from the immutable pregame receipt.'}</small>
     </header>
     <div className="ss-history-receipt-details-grid">
-      <article><small>{recovered?'LEVLINE PREGAME SPREAD':'LEVLINE LOCKED SPREAD'}</small><strong>{lineText(lockedModel,row.home_team,row.away_team)}</strong><span>Model margin at lock</span></article>
+      <article><small>{recovered?'LEVLINE PREGAME SPREAD':'LEVLINE LOCKED SPREAD'}</small><strong>{lineText(lockedModel,row.home_team,row.away_team)}</strong><span>{recovered?'Model margin from verified pregame snapshot':'Model margin at lock'}</span></article>
       <article><small>{recovered?'MARKET SPREAD AT SNAPSHOT':'MARKET SPREAD AT LOCK'}</small><strong>{lineText(lockedMarket,row.home_team,row.away_team)}</strong><span>{recovered?'Market line in the verified pre-kickoff snapshot':'Sportsbook line captured with the receipt'}</span></article>
       <article><small>{recovered?'EDGE AT SNAPSHOT':'EDGE AT LOCK'}</small><strong>{edgeText(lockedEdge)}</strong><span>LevLine margin minus market line</span></article>
-      <article><small>CLOSING SPREAD</small><strong>{closing?lineText(closing,row.home_team,row.away_team):'Not stored'}</strong><span>{closing?'Separate post-lock close':'Never inferred from the lock line'}</span></article>
+      <article><small>CLOSING SPREAD</small><strong>{closing?lineText(closing,row.home_team,row.away_team):'Not stored'}</strong><span>{closing?'Separately stored closing market line':'Never inferred from the pregame market line'}</span></article>
       <article className="final-score"><small>FINAL SCORE</small><strong>{final || 'Not stored'}</strong><span>{final?'Graded result':'No score is present in this artifact'}</span></article>
     </div>
   </section>
