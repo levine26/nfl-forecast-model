@@ -61,20 +61,21 @@ function score(row) {
 }
 
 function ReceiptDetails({row}) {
+  const recovered=row.lock_status==='RECOVERED_MISSED_LOCK'
   const lockedModel=row.locked_model_spread || row.expected_margin
   const lockedMarket=row.locked_market_spread || row.spread_line
   const lockedEdge=row.locked_edge || row.model_edge
   const closing=row.closing_spread || row.closing_spread_line || row.close_spread || row.close_spread_line
   const final=score(row)
-  return <section className="ss-history-receipt-details" aria-label="Locked forecast details">
+  return <section className="ss-history-receipt-details" aria-label={recovered?'Recovered pregame forecast details':'Locked forecast details'}>
     <header>
-      <span>LOCKED FORECAST DETAILS</span>
-      <small>Values below are from the immutable pregame receipt.</small>
+      <span>{recovered?'RECOVERED PREGAME FORECAST DETAILS':'LOCKED FORECAST DETAILS'}</span>
+      <small>{recovered?'Values from the verified pre-kickoff source; there was no official lock.':'Values below are from the immutable pregame receipt.'}</small>
     </header>
     <div className="ss-history-receipt-details-grid">
-      <article><small>LEVLINE LOCKED SPREAD</small><strong>{lineText(lockedModel,row.home_team,row.away_team)}</strong><span>Model margin at lock</span></article>
-      <article><small>MARKET SPREAD AT LOCK</small><strong>{lineText(lockedMarket,row.home_team,row.away_team)}</strong><span>Sportsbook line captured with the receipt</span></article>
-      <article><small>EDGE AT LOCK</small><strong>{edgeText(lockedEdge)}</strong><span>LevLine margin minus market line</span></article>
+      <article><small>{recovered?'LEVLINE PREGAME SPREAD':'LEVLINE LOCKED SPREAD'}</small><strong>{lineText(lockedModel,row.home_team,row.away_team)}</strong><span>Model margin at lock</span></article>
+      <article><small>{recovered?'MARKET SPREAD AT SNAPSHOT':'MARKET SPREAD AT LOCK'}</small><strong>{lineText(lockedMarket,row.home_team,row.away_team)}</strong><span>{recovered?'Market line in the verified pre-kickoff snapshot':'Sportsbook line captured with the receipt'}</span></article>
+      <article><small>{recovered?'EDGE AT SNAPSHOT':'EDGE AT LOCK'}</small><strong>{edgeText(lockedEdge)}</strong><span>LevLine margin minus market line</span></article>
       <article><small>CLOSING SPREAD</small><strong>{closing?lineText(closing,row.home_team,row.away_team):'Not stored'}</strong><span>{closing?'Separate post-lock close':'Never inferred from the lock line'}</span></article>
       <article className="final-score"><small>FINAL SCORE</small><strong>{final || 'Not stored'}</strong><span>{final?'Graded result':'No score is present in this artifact'}</span></article>
     </div>
@@ -94,7 +95,7 @@ export default function HistoryReceiptDetails() {
 
   useEffect(()=>{ fetchHistory().then(setHistory) },[])
 
-  const row=useMemo(()=>gameId ? history.find(item=>item.game_id===gameId && item.lock_status==='LOCKED') : null,[gameId,history])
+  const row=useMemo(()=>gameId ? history.find(item=>item.game_id===gameId && (item.lock_status==='LOCKED' || (item.lock_status==='RECOVERED_MISSED_LOCK' && item.recovery_source_commit_sha && Number.isFinite(Date.parse(item.recovery_source_prediction_timestamp_utc || '')) && Date.parse(item.recovery_source_prediction_timestamp_utc) < Date.parse(item.kickoff_utc || '')))) : null,[gameId,history])
 
   useEffect(()=>{
     if (!gameId) { setHost(null); document.getElementById('ss-history-receipt-details-host')?.remove(); return }
