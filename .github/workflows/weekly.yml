@@ -143,6 +143,24 @@ jobs:
               echo "Push failed even though main did not advance; refusing to mask a non-race publish error."
               exit 1
             fi
+
+            # Research-only bot commits do not change the official model or
+            # publication inputs. Preserve the already-validated frozen F-ST
+            # forecast rather than re-running a costly fit for a disjoint push.
+            # Any production/config/output change must use the normal guarded
+            # regeneration attempt above.
+            advance_files=$(git diff --name-only "$base_sha" origin/main)
+            if [ -n "$advance_files" ] && ! printf '%s\n' "$advance_files" | grep -Ev '^(challenger_outputs/|research/)' | grep -q .; then
+              echo "Only research files advanced on main; attempting safe publication rebase."
+              if git rebase origin/main; then
+                if git push origin HEAD:main; then
+                  echo "Published frozen-model forecast over disjoint research-only commits."
+                  exit 0
+                fi
+              fi
+              git rebase --abort >/dev/null 2>&1 || true
+              git fetch origin main
+            fi
           done
 
           echo "main changed during all three generation attempts; leaving existing published outputs untouched."
