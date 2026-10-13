@@ -46,6 +46,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # Do not cancel an already-running full rebuild by dispatching its
+          # concurrency competitor. The full workflow itself queues extra events.
+          active=$(gh run list --workflow weekly.yml --branch main --limit 20 \
+            --json status --jq '[.[] | select(.status == "in_progress" or .status == "queued" or .status == "pending" or .status == "waiting")] | length')
+          if [ "$active" -gt 0 ]; then
+            echo "::notice title=Full-week refresh already active::A full frozen-model refresh is already queued or running; skipping duplicate dispatch."
+            exit 0
+          fi
           gh workflow run weekly.yml --ref main
           echo "::warning title=Full-week refresh dispatched::Published slate is behind the upstream completed-game schedule. Full daily model workflow was dispatched; market-only scoring was correctly bypassed."
       - name: Refresh and publish market outputs
