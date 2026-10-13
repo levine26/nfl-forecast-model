@@ -15,3 +15,12 @@ def test_market_rollover_skips_duplicate_full_model_dispatch():
     assert 'if [ "$active" -gt 0 ]; then' in yml
     assert "gh workflow run weekly.yml --ref main" in yml
     assert "steps.rollover.outputs.required == 'true'" in yml
+
+
+def test_research_only_main_races_do_not_force_another_model_fit():
+    yml = (ROOT / "weekly.yml").read_text(encoding="utf-8")
+    assert 'advance_files=$(git diff --name-only "$base_sha" origin/main)' in yml
+    assert "challenger_outputs/" in yml
+    assert "git rebase origin/main" in yml
+    assert "git rebase --abort" in yml
+    assert "git fetch origin main" in yml
