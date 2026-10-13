@@ -146,6 +146,21 @@ def _rescore_winner_probability(p: pd.DataFrame) -> None:
     p["fst_vs_legacy_delta"] = 0.0
 
 
+def _set_market_snapshot_provenance(p: pd.DataFrame, observed_market: pd.Series, timestamp: str) -> None:
+    """Preserve provenance strings when all prior CSV timestamps are blank.
+
+    pandas 3 infers an all-missing timestamp column as float64; writing an ISO
+    string to it otherwise raises TypeError and kills the hourly refresh.
+    """
+    for col in ("market_snapshot_timestamp_utc", "market_snapshot_source"):
+        if col in p.columns:
+            p[col] = p[col].astype("object")
+        else:
+            p[col] = pd.Series(pd.NA, index=p.index, dtype="object")
+    p.loc[observed_market, "market_snapshot_timestamp_utc"] = timestamp
+    p.loc[observed_market, "market_snapshot_source"] = "nflverse_games.csv_moneyline"
+
+
 def refresh(output_dir: str = "outputs", season: int = 2026) -> pd.DataFrame:
     path = Path(output_dir) / "this_week.csv"
     if not path.exists():
@@ -197,20 +212,7 @@ def refresh(output_dir: str = "outputs", season: int = 2026) -> pd.DataFrame:
 
     _winner_diagnostics(p)
     timestamp = datetime.now(timezone.utc).isoformat()
-    previous_market_ts = (
-        p["market_snapshot_timestamp_utc"].copy()
-        if "market_snapshot_timestamp_utc" in p.columns
-        else pd.Series(np.nan, index=p.index, dtype=object)
-    )
-    previous_market_source = (
-        p["market_snapshot_source"].copy()
-        if "market_snapshot_source" in p.columns
-        else pd.Series(np.nan, index=p.index, dtype=object)
-    )
-    p["market_snapshot_timestamp_utc"] = previous_market_ts
-    p.loc[observed_market, "market_snapshot_timestamp_utc"] = timestamp
-    p["market_snapshot_source"] = previous_market_source
-    p.loc[observed_market, "market_snapshot_source"] = "nflverse_games.csv_moneyline"
+    _set_market_snapshot_provenance(p, observed_market, timestamp)
     usable_market = pd.Series(
         np.isfinite(pd.to_numeric(p["market_home_prob"], errors="coerce").to_numpy(dtype=float)),
         index=p.index,

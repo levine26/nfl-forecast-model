@@ -15,6 +15,7 @@ on:
     - cron: "35 * * * *"
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: nfl-market-refresh
   cancel-in-progress: true
@@ -29,7 +30,26 @@ jobs:
           cache: pip
       - run: pip install "pandas==3.0.5" "numpy==2.4.6" "requests>=2.32"
       - run: pip install -e . --no-deps
+      - name: Check whether a new full-week forecast is needed
+        id: rollover
+        run: |
+          set -euo pipefail
+          python scripts/check_week_rollover.py | tee /tmp/week-rollover.txt
+          if grep -qx 'required=true' /tmp/week-rollover.txt; then
+            echo "required=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "required=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Recover stale slate through full frozen-model build
+        if: steps.rollover.outputs.required == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run weekly.yml --ref main
+          echo "::warning title=Full-week refresh dispatched::Published slate is behind the upstream completed-game schedule. Full daily model workflow was dispatched; market-only scoring was correctly bypassed."
       - name: Refresh and publish market outputs
+        if: steps.rollover.outputs.required != 'true'
         run: |
           set -euo pipefail
           git config user.name "nfl-market-bot"
