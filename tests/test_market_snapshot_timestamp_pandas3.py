@@ -8,11 +8,8 @@ from scripts.refresh_market import _stamp_market_observation
 
 
 def test_blank_csv_market_metadata_can_be_timestamped():
-    predictions = pd.read_csv(StringIO(
-        "game_id,market_snapshot_timestamp_utc,market_snapshot_source\\n"
-        "g1,,\\n"
-        "g2,,\\n"
-    ).replace("\\n", "\n"))
+    csv = "game_id,market_snapshot_timestamp_utc,market_snapshot_source\\ng1,,\\ng2,,\\n"
+    predictions = pd.read_csv(StringIO(csv))
     assert predictions["market_snapshot_timestamp_utc"].dtype.kind == "f"
     assert predictions["market_snapshot_source"].dtype.kind == "f"
 
