@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 73,
-    "on_time": 4,
+    "on_time": 5,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -778,11 +778,22 @@
       "minutes_late_vs_target": 7.5184,
       "scheduled_lock_utc": "2026-10-12T22:15:00+00:00",
       "target_minutes_before_kickoff": 120.0
+    },
+    {
+      "actual_lock_utc": "2026-10-15T23:15:15.804633+00:00",
+      "classification": "on_time",
+      "game_id": "2026_06_SEA_DEN",
+      "minutes_before_kickoff": 59.7366,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.2634,
+      "scheduled_lock_utc": "2026-10-15T23:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 77,
-  "official_lock_target_minutes": 120.0,
+  "locked_count": 78,
+  "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
+    60.0,
     120.0
   ],
   "policy_effective_2026_week": 6,
