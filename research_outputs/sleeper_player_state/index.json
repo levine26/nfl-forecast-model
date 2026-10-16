@@ -6038,6 +6038,189 @@
       "retrieval_timestamp_utc": "2026-10-15T14:15:17.213350Z",
       "source_commit_sha": "ba8b41d95367bfb168564dc33da7fe2eb2885252",
       "source_commit_timestamp_utc": "2026-10-15T13:07:26Z"
+    },
+    {
+      "content_sha256": "84b715d8ffd8eb71fe366f0295248e2189dc2c79ede7271bcacec33d41b7ec7d",
+      "field_metrics": {
+        "active": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "age": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2712,
+          "non_null_rate": 0.988698505286183
+        },
+        "depth_chart_order": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 1522,
+          "non_null_rate": 0.5548669340138535
+        },
+        "depth_chart_position": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 1979,
+          "non_null_rate": 0.7214728399562523
+        },
+        "espn_id": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 754,
+          "non_null_rate": 0.27488151658767773
+        },
+        "fantasy_data_id": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2720,
+          "non_null_rate": 0.991615020051039
+        },
+        "first_name": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "full_name": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "gsis_id": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 576,
+          "non_null_rate": 0.20998906306963178
+        },
+        "injury_body_part": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 568,
+          "non_null_rate": 0.20707254830477578
+        },
+        "injury_notes": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 118,
+          "non_null_rate": 0.04301859278162596
+        },
+        "injury_start_date": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 0,
+          "non_null_rate": 0.0
+        },
+        "injury_status": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 574,
+          "non_null_rate": 0.20925993437841778
+        },
+        "last_name": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "number": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "position": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2737,
+          "non_null_rate": 0.997812613926358
+        },
+        "practice_description": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 1,
+          "non_null_rate": 0.0003645643456069996
+        },
+        "practice_participation": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 1,
+          "non_null_rate": 0.0003645643456069996
+        },
+        "rotowire_id": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2580,
+          "non_null_rate": 0.9405760116660591
+        },
+        "sportradar_id": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2706,
+          "non_null_rate": 0.986511119212541
+        },
+        "status": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "team": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2743,
+          "non_null_rate": 1.0
+        },
+        "yahoo_id": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 774,
+          "non_null_rate": 0.2821728034998177
+        },
+        "years_exp": {
+          "key_present_count": 2743,
+          "key_present_rate": 1.0,
+          "non_null_count": 2742,
+          "non_null_rate": 0.999635435654393
+        }
+      },
+      "fields": [
+        "active",
+        "age",
+        "depth_chart_order",
+        "depth_chart_position",
+        "espn_id",
+        "fantasy_data_id",
+        "first_name",
+        "full_name",
+        "gsis_id",
+        "injury_body_part",
+        "injury_notes",
+        "injury_start_date",
+        "injury_status",
+        "last_name",
+        "number",
+        "player_id",
+        "position",
+        "practice_description",
+        "practice_participation",
+        "rotowire_id",
+        "sportradar_id",
+        "status",
+        "team",
+        "yahoo_id",
+        "years_exp"
+      ],
+      "filename": "20261016T130251Z__5b5531de10ed.json.gz",
+      "player_count": 2743,
+      "production_authorized": false,
+      "research_only": true,
+      "retrieval_timestamp_utc": "2026-10-16T14:04:58.779725Z",
+      "source_commit_sha": "5b5531de10ed342d16883d64e740a59891b9906b",
+      "source_commit_timestamp_utc": "2026-10-16T13:02:51Z"
     }
   ],
   "schema_version": "levline-sleeper-player-state-index-v1"
