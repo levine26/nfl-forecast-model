@@ -320,11 +320,19 @@ export default function SignalEnhancements() {
   },[route.page])
 
   useEffect(()=>{;(async()=>{
-    const [forecastPayload,runs,history,ratings,status,current]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchCSV('power_ratings.csv'),fetchJSON('status.json',{}),fetchCSV('this_week.csv'),
+    const [forecastPayload,history,ratings,status,current]=await Promise.all([
+      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('prediction_history.csv'),fetchCSV('power_ratings.csv'),fetchJSON('status.json',{}),fetchCSV('this_week.csv'),
     ])
-    setData({games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],runs,history,ratings,status,current})
+    setData(previous=>({...previous,games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],history,ratings,status,current}))
   })()},[])
+  useEffect(()=>{
+    if (route.page!=='game') return
+    let active=true
+    fetchCSV('run_history.csv').then(runs=>{
+      if (active) setData(previous=>({...previous,runs}))
+    })
+    return ()=>{active=false}
+  },[route.page])
 
   const selected=route.page==='game'?data.games.find(game=>game.game_id===route.gameId):null
   const diagnostic=selected ? data.current.find(row=>row.game_id===selected.game_id) || data.history.find(row=>row.game_id===selected.game_id&&row.lock_status==='LOCKED') : null
