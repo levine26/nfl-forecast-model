@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 73,
+    "late": 74,
     "on_time": 13,
     "premature": 0
   },
@@ -868,9 +868,19 @@
       "minutes_late_vs_target": 1.6293,
       "scheduled_lock_utc": "2026-10-18T19:05:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-18T23:44:14.327228+00:00",
+      "classification": "late",
+      "game_id": "2026_06_DAL_GB",
+      "minutes_before_kickoff": 35.7612,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 24.2388,
+      "scheduled_lock_utc": "2026-10-18T23:20:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 86,
+  "locked_count": 87,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
