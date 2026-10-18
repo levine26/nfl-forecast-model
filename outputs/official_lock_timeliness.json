@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 73,
-    "on_time": 12,
+    "on_time": 13,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -858,9 +858,19 @@
       "minutes_late_vs_target": 6.9459,
       "scheduled_lock_utc": "2026-10-18T16:00:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-18T19:06:37.755577+00:00",
+      "classification": "on_time",
+      "game_id": "2026_06_ARI_LA",
+      "minutes_before_kickoff": 58.3707,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 1.6293,
+      "scheduled_lock_utc": "2026-10-18T19:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 85,
+  "locked_count": 86,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
