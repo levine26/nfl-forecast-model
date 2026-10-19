@@ -2,15 +2,15 @@
   "automatic_promotion": false,
   "candidate_horizon_metrics": {
     "L4-FST-H-V1__T-30m": {
-      "brier": 0.24473027827026766,
+      "brier": 0.2474470216355622,
       "calibration_intercept": null,
       "calibration_slope": null,
-      "games": 16,
+      "games": 17,
       "gate_sample_ready": false,
-      "log_loss": 0.680890042616421,
-      "sharpness": 0.13093430292912003,
-      "weeks": 3,
-      "winner_accuracy": 0.5625
+      "log_loss": 0.6864347421711159,
+      "sharpness": 0.12554789037244046,
+      "weeks": 4,
+      "winner_accuracy": 0.5294117647058824
     },
     "L4-FST-H-V1__T-45m": {
       "brier": 0.24891198231524944,
@@ -46,15 +46,15 @@
       "winner_accuracy": 0.5
     },
     "L4-MKT-H-V1__T-30m": {
-      "brier": 0.2378696360467258,
+      "brier": 0.23906317116314657,
       "calibration_intercept": null,
       "calibration_slope": null,
-      "games": 16,
+      "games": 17,
       "gate_sample_ready": false,
-      "log_loss": 0.6658157195493828,
-      "sharpness": 0.12863102004064453,
-      "weeks": 3,
-      "winner_accuracy": 0.5
+      "log_loss": 0.6683835053493772,
+      "sharpness": 0.12154061984308782,
+      "weeks": 4,
+      "winner_accuracy": 0.47058823529411764
     },
     "L4-MKT-H-V1__T-45m": {
       "brier": 0.24191203248108778,
@@ -82,25 +82,26 @@
   "candidate_vs_incumbent": {
     "L4-FST-H-V1__T-30m": {
       "benchmark": "official_T-120_F-ST",
-      "brier_delta": -0.006930183295231157,
+      "brier_delta": -0.006240037948755186,
       "brier_week_block_bootstrap": {
-        "ci95_high": -0.005768920775071535,
-        "ci95_low": -0.01545049902772605,
+        "ci95_high": -0.00026090906078625464,
+        "ci95_low": -0.015059020936348505,
         "draws": 10000,
-        "mean_delta": -0.006930183295231157,
+        "mean_delta": -0.006240037948755186,
         "seed": 20260912,
-        "week_blocks": 3
+        "week_blocks": 4
       },
-      "games": 16,
+      "games": 17,
       "leave_one_week_out_brier": {
         "all_remaining_negative": true,
         "deltas": {
-          "2026-W3": -0.015059020936348505,
-          "2026-W4": -0.0063621622463981625,
-          "2026-W5": -0.006414359325248502
+          "2026-W3": -0.008438584759278889,
+          "2026-W4": -0.005664384131319507,
+          "2026-W5": -0.0057133188927417,
+          "2026-W6": -0.006930183295231157
         },
-        "max_remaining_delta": -0.0063621622463981625,
-        "weeks": 3
+        "max_remaining_delta": -0.005664384131319507,
+        "weeks": 4
       }
     },
     "L4-FST-H-V1__T-45m": {
@@ -171,25 +172,26 @@
     },
     "L4-MKT-H-V1__T-30m": {
       "benchmark": "official_T-120_F-ST",
-      "brier_delta": -0.01379082551877302,
+      "brier_delta": -0.01462388842117083,
       "brier_week_block_bootstrap": {
-        "ci95_high": -0.0015683494242322848,
-        "ci95_low": -0.028257378537191014,
+        "ci95_high": -0.008240606702471967,
+        "ci95_low": -0.028105136698363398,
         "draws": 10000,
-        "mean_delta": -0.01379082551877302,
+        "mean_delta": -0.01462388842117083,
         "seed": 20260912,
-        "week_blocks": 3
+        "week_blocks": 4
       },
-      "games": 16,
+      "games": 17,
       "leave_one_week_out_brier": {
         "all_remaining_negative": true,
         "deltas": {
-          "2026-W3": -0.01491286398071165,
-          "2026-W4": -0.01460565725840907,
-          "2026-W5": -0.012826388650878488
+          "2026-W3": -0.019259540940319692,
+          "2026-W4": -0.01543985960847949,
+          "2026-W5": -0.013771795288919569,
+          "2026-W6": -0.01379082551877302
         },
-        "max_remaining_delta": -0.012826388650878488,
-        "weeks": 3
+        "max_remaining_delta": -0.013771795288919569,
+        "weeks": 4
       }
     },
     "L4-MKT-H-V1__T-45m": {
@@ -422,11 +424,11 @@
   "evaluation_version": "LEVLINE4-HORIZON-EVAL-V1-PIT-HARDENED",
   "excluded_invalid_probability_rows": 0,
   "excluded_tie_rows": 0,
-  "excluded_ungraded_rows": 4,
+  "excluded_ungraded_rows": 2,
   "formal_family_inference_required": false,
   "gate_status": "ACCUMULATING_PROSPECTIVE_EVIDENCE",
-  "generated_at_utc": "2026-10-19T05:13:02.223889+00:00",
-  "graded_shadow_rows": 96,
+  "generated_at_utc": "2026-10-19T13:52:22.632956+00:00",
+  "graded_shadow_rows": 98,
   "horizon_completeness_audit": {
     "all_four_share_among_games_with_any": 0.47619047619047616,
     "games_with_all_four_eligible_horizons": 10,
@@ -461,27 +463,28 @@
   "paired_model_vs_same_horizon_market": {
     "T-30m": {
       "benchmark": "L4-MKT-H-V1",
-      "brier_delta": 0.006860642223541866,
+      "brier_delta": 0.008383850472415647,
       "brier_week_block_bootstrap": {
-        "ci95_high": 0.013589835692220054,
-        "ci95_low": -0.013882149603493765,
+        "ci95_high": 0.02317250907330809,
+        "ci95_low": -0.0022228165890212925,
         "draws": 10000,
-        "mean_delta": 0.006860642223541866,
+        "mean_delta": 0.008383850472415647,
         "seed": 20260912,
-        "week_blocks": 3
+        "week_blocks": 4
       },
-      "games": 16,
+      "games": 17,
       "leave_one_week_out_brier": {
         "all_remaining_negative": false,
         "deltas": {
-          "2026-W3": -0.00014615695563685582,
-          "2026-W4": 0.008243495012010908,
-          "2026-W5": 0.006412029325629986
+          "2026-W3": 0.010820956181040805,
+          "2026-W4": 0.009775475477159984,
+          "2026-W5": 0.00805847639617787,
+          "2026-W6": 0.006860642223541866
         },
-        "max_remaining_delta": 0.008243495012010908,
-        "weeks": 3
+        "max_remaining_delta": 0.010820956181040805,
+        "weeks": 4
       },
-      "log_loss_delta": 0.015074323067038183
+      "log_loss_delta": 0.018051236821738623
     },
     "T-45m": {
       "benchmark": "L4-MKT-H-V1",
