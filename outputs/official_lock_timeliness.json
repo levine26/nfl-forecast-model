@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 74,
-    "on_time": 13,
+    "on_time": 14,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -878,9 +878,19 @@
       "minutes_late_vs_target": 24.2388,
       "scheduled_lock_utc": "2026-10-18T23:20:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-19T23:16:47.647847+00:00",
+      "classification": "on_time",
+      "game_id": "2026_06_WAS_SF",
+      "minutes_before_kickoff": 58.2059,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 1.7941,
+      "scheduled_lock_utc": "2026-10-19T23:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 87,
+  "locked_count": 88,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
