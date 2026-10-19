@@ -1,0 +1,70 @@
+{
+  "providers": {
+    "chzn1_td": {
+      "availability": "CODE_AVAILABLE_NOT_EXECUTED",
+      "evidence": "2021-23 train, 2024 selection, 2025 holdout ROC-AUC 0.6876 RF; independent NFL Brier/ROI not established",
+      "label": "CHZN1 NFL Anytime Touchdown Model",
+      "markets": [
+        "anytime_td"
+      ],
+      "quality_prior": 3.5,
+      "url": "https://github.com/CHZN1/nfl-anytime-td-model"
+    },
+    "custom_venom": {
+      "availability": "METHODOLOGY_ONLY_UNQUALIFIED_API",
+      "evidence": "Public volume-efficiency-range description; quantitative NFL betting calibration/independent feed and identity with Jake Venom unverified",
+      "label": "Custom Venom NFL Fantasy Methodology",
+      "markets": [
+        "anytime_td",
+        "pass_yards",
+        "rush_yards",
+        "receiving_yards",
+        "receptions"
+      ],
+      "quality_prior": 2.0,
+      "url": "https://customvenom.com/methodology"
+    },
+    "gameday": {
+      "availability": "METHODOLOGY_ONLY_UNQUALIFIED_API",
+      "evidence": "Published sport/market specific evaluation policy; independently reverified prospective performance unavailable",
+      "label": "GameDay Analytics NFL Props",
+      "markets": [
+        "pass_yards",
+        "rush_yards",
+        "receiving_yards",
+        "receptions",
+        "pass_tds"
+      ],
+      "quality_prior": 2.5,
+      "url": "https://nfl.gamedayanalytics.net/props/methodology"
+    },
+    "jmutammara": {
+      "availability": "CODE_AVAILABLE_NOT_EXECUTED",
+      "evidence": "Open-source heteroscedastic player and Poisson TD architecture; reproducible performance not independently checked",
+      "label": "JMutammara NFL Open-Source Player Models",
+      "markets": [
+        "anytime_td",
+        "pass_yards",
+        "rush_yards",
+        "receiving_yards"
+      ],
+      "quality_prior": 2.5,
+      "url": "https://github.com/JMutammara/NFL"
+    },
+    "startwho": {
+      "availability": "MARKET_CONTEXT_ONLY_NOT_INDEPENDENT_MODEL",
+      "evidence": "Potential multi-book market quotes, overlapping information; source-specific quote timestamps and licensing not verified",
+      "label": "StartWho / Alexandria market-prop aggregation",
+      "markets": [
+        "anytime_td",
+        "pass_yards",
+        "rush_yards",
+        "receiving_yards",
+        "receptions"
+      ],
+      "quality_prior": 0.0,
+      "url": "https://www.startwho.com/"
+    }
+  },
+  "status": "COMPARISON_ONLY_NOT_AUTOMATIC_BETTING_ELIGIBLE"
+}

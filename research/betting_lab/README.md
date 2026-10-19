@@ -1,0 +1,68 @@
+# LevLine Betting Lab — research v0.3.2
+
+**Status: RESEARCH ONLY / UNVALIDATED / NO BETTING AUTOMATION.**
+
+This is a standalone Python prototype. It makes **no changes** to the official Sunday Signal model, frozen F-ST artifacts, locks, production site, or betting outcomes. It does not scrape bookmakers or check injuries. No historical success rate or profitability is claimed by these tests.
+
+## Run
+
+```bash
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python -m betlab.cli ledger
+python -m betlab.cli demo --samples 2000
+```
+
+Run from the project root. The `demo` uses **fabricated games, fabricated quotes, and an uncalibrated simulator**. It is intended to verify calculations, NOT select wagers.
+
+## Modules
+
+- `pricing.py`: American odds, implied probabilities, proportional de-vig, push-aware expected net return, normalized timestamp-qualified quotes, fractional Kelly math
+- `settlement.py`: graded moneyline (including overtime ties), spread, totals, player props, TD markets, teaser/round-robin/parlay settlement and explicit push policies
+- `scenarios.py`: correlated same-game betting tickets priced against an explicitly supplied joint scenario distribution; full-portfolio net return with shared scenario outcomes
+- `evaluation.py`: point-in-time quote/prediction guards, push-aware grading, ROI, calibration, true later-price CLV where comparable, block-bootstrap intervals
+- `player_models.py`: leak-aware prior-only player features, trainable touchdown Logistic/HGB candidates, yardage HGB baselines, season-forward holdout; no sports data included
+- `joint_simulator.py`: **synthetic / uncalibrated** drive-score and TD scenario test generator; shared pace creates within-game correlations
+- `risk.py`: conservative-stake *simulation* with hard $45 session budget, per-game exposure caps and no-bet gating for unqualified forecasts
+- `sources.py`: create-only SHA-256 archival envelopes; qualified manual quotes; unqualified provider subquotes blocked without per-book quote timestamps
+- `ledger.py`: verified append-only implementation receipts
+- `levline_scout.py`: existing-LevLine F-ST, margin and total bridge that ranks per-game scouting angles *without* inventing sportsbook prices or treating prior ATS research as proven profitable
+- `live_board.py`: tomorrow-ready manual timestamp-qualified direct-operator quote board against the current LevLine CSV; no claim of validated value
+- `cli.py`: manually invoked research board, synthetic demonstration and ledger audit
+
+## What this is NOT
+
+- No model has passed real point-in-time NFL holdout evaluation in this package.
+- No odds are fetched or placed automatically. No profitable expectation is claimed.
+- The synthetic scorer does not reproduce calibrated NFL key-margin frequencies.
+- Historical data must be independently qualified for acquisition timestamps; nflverse *closing odds* cannot be relabeled earlier pregame snapshots.
+- Player TD models are templates until point-in-time data is verified and real training/evaluation completed.
+- Sportsbook parlay/teaser pricing and pushes require the **actual** operator's rules.
+- The rule-based Kelly allocation is a paper simulation, not an authorization to stake money.
+
+See `docs/HANDOFF.md`, `docs/ROADMAP.md`, `docs/SCIENTIFIC_PROTOCOL.md` and `docs/IMPLEMENTATION_LOG.jsonl` before continuing.
+
+## Sunday pregame operating instructions
+
+See `docs/TOMORROW_RUNBOOK.md`. Run `python -m betlab.cli board --slate ../../outputs/this_week.csv --quotes /private/direct-book.json --outdir /private/immutable-reports`. Every board row remains research-only with $0 automatic stake. Verify your direct-book quote and event time before using it.
+
+## Sunday full-slate scout (no manual odds needed)
+
+`python -m betlab.cli scout --slate ../../outputs/this_week.csv --status ../../outputs/status.json --date 2026-10-11 --outdir /private/reports`
+
+This returns model watchlists, **not** validated profitable bets. Historical ATS candidate failures and unqualified source-market timing are explicit. See `docs/TOMORROW_RUNBOOK.md`.
+
+
+## B07D — Critical separation of moneyline versus spread/total (2026-10-10)
+
+See [`docs/SCOUT_MARKET_SEPARATION_CORRECTION.md`](docs/SCOUT_MARKET_SEPARATION_CORRECTION.md) for the supersession receipt. F-ST outright winner probabilities **never determine** ATS cover rates. Spread and total scenario probabilities use independent margin/total forecasts, with integer push approximations and no profitability or calibration guarantee. Old Scout B07C reports are superseded; use newly generated market-specific v0.3.2 output. Local 59-test suite passed. Research-only PR #697 remains CI-gated; no production model changes or injuries.
+
+## Sunday 2026-10-11 B08A scope: game markets only
+
+The short historical sprint **excludes TD and all player props**. A new research-only CLI audits real 2021–2025 pre-kickoff game forecasts when provided, separately evaluating moneyline winner prediction, ATS cover/push/loss, and total over/push/under. It never infers playable historical odds or ROI. The existing LevLine 2022–2025 frozen winner accuracy and negative ATS results are preserved in `evidence/FROZEN_BASELINES_2022_2025.json` and `reports/b08_sprint/VERIFIED_HISTORICAL_STATUS.md`; 2021 same-method out-of-fold forecasts were not independently qualified. No fabricated five-season full evaluation.
+
+Run `python -m betlab.cli historical-games --csv /private/pregame_games.csv --out /private/historical_audit.json` once source-qualified rows exist. `python -m betlab.cli prop-providers` produces the separately ranked provider registry for CHZN1, JMutammara, Custom Venom and GameDay Analytics; third-party predictions can be compared *only when real, authorized, timestamped numeric forecasts are provided*. StartWho quotes are market context, never independent model votes. Weights are provisional comparison priors, **not trained betting confidence**. See `docs/B08_SPRINT_GAME_MARKETS.md`, `docs/EXTERNAL_PROP_PROVIDER_STRATEGY.md`, and `docs/SUNDAY_2026-10-11_PRIORITY.md`.
+
+## B08B — Archived historical game-markets audit (2022–2024)
+
+Uses paired existing OOF A0/B0/C0 historical forecasts and the exact baseline rows. The evaluator is `python -m betlab.cli frozen-oof-audit --baselines <canonical BASELINES_2022_2024.csv> --oof <canonical FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv> --out <immutable JSON>`. This is exploratory prior-development comparison, not current F-ST validation or executable historical sportsbook ROI. Moneyline ties are explicitly excluded from binary winner scoring; spread and totals retain those tied games. See roadmap and ledger. 2021 has been removed as a prerequisite per the user's instruction.
