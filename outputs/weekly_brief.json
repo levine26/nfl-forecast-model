@@ -1,12 +1,6 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_07_LA_LV",
-      "largest_driver": "Market movement",
-      "pick": "LA",
-      "pick_delta_pp": -1.6770315589972995
-    },
-    {
       "game_id": "2026_05_BUF_LA",
       "largest_driver": "Market movement",
       "pick": "LA",
@@ -17,36 +11,42 @@
       "largest_driver": "Market movement",
       "pick": "SF",
       "pick_delta_pp": -0.7037037747535946
+    },
+    {
+      "game_id": "2026_04_ATL_NO",
+      "largest_driver": "Market movement",
+      "pick": "NO",
+      "pick_delta_pp": -0.5230298770820707
     }
   ],
-  "generated_utc": "2026-10-22T23:04:08.910466+00:00",
+  "generated_utc": "2026-10-22T23:21:54.845682+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
       "game_id": "2026_07_DAL_PHI",
       "matchup": "DAL @ PHI",
       "pick": "DAL",
-      "pick_prob": 0.6994555916212104,
+      "pick_prob": 0.6994555916212597,
       "projected_score": "PHI 21.8 \u2013 DAL 20.7",
-      "pure_market_gap_pp": 17.230810723388096
+      "pure_market_gap_pp": 17.230810677733892
     },
     {
       "confidence": "Lean",
       "game_id": "2026_07_SF_ATL",
       "matchup": "SF @ ATL",
       "pick": "SF",
-      "pick_prob": 0.5578528024836336,
+      "pick_prob": 0.5578528024841716,
       "projected_score": "ATL 19.3 \u2013 SF 26.2",
-      "pure_market_gap_pp": 13.443985973337448
+      "pure_market_gap_pp": 13.443986017022796
     },
     {
       "confidence": "Lean",
       "game_id": "2026_07_NE_CHI",
       "matchup": "NE @ CHI",
       "pick": "CHI",
-      "pick_prob": 0.5893757937685121,
+      "pick_prob": 0.5893757937678881,
       "projected_score": "CHI 22.1 \u2013 NE 22.5",
-      "pure_market_gap_pp": 12.824000188281587
+      "pure_market_gap_pp": 12.824000148808523
     }
   ],
   "most_uncertain": [
@@ -55,7 +55,7 @@
       "game_id": "2026_07_CIN_BAL",
       "matchup": "CIN @ BAL",
       "pick": "BAL",
-      "pick_prob": 0.5007182759862278,
+      "pick_prob": 0.5007182759853918,
       "projected_score": "BAL 23.5 \u2013 CIN 22.7"
     },
     {
@@ -63,7 +63,7 @@
       "game_id": "2026_07_CLE_TEN",
       "matchup": "CLE @ TEN",
       "pick": "CLE",
-      "pick_prob": 0.5568244190844798,
+      "pick_prob": 0.5568244190836417,
       "projected_score": "TEN 19.7 \u2013 CLE 22.4"
     },
     {
@@ -71,7 +71,7 @@
       "game_id": "2026_07_SF_ATL",
       "matchup": "SF @ ATL",
       "pick": "SF",
-      "pick_prob": 0.5578528024836336,
+      "pick_prob": 0.5578528024841716,
       "projected_score": "ATL 19.3 \u2013 SF 26.2"
     }
   ],
@@ -81,7 +81,7 @@
       "game_id": "2026_07_NYG_HOU",
       "matchup": "NYG @ HOU",
       "pick": "HOU",
-      "pick_prob": 0.8126732612536514,
+      "pick_prob": 0.812673261253836,
       "projected_score": "HOU 25.4 \u2013 NYG 18.5"
     },
     {
@@ -89,7 +89,7 @@
       "game_id": "2026_07_IND_MIN",
       "matchup": "IND @ MIN",
       "pick": "MIN",
-      "pick_prob": 0.703110927194879,
+      "pick_prob": 0.7031109271941319,
       "projected_score": "MIN 24.7 \u2013 IND 19.5"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_07_DAL_PHI",
       "matchup": "DAL @ PHI",
       "pick": "DAL",
-      "pick_prob": 0.6994555916212104,
+      "pick_prob": 0.6994555916212597,
       "projected_score": "PHI 21.8 \u2013 DAL 20.7"
     }
   ],

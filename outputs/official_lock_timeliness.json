@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 74,
-    "on_time": 14,
+    "on_time": 15,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -888,9 +888,19 @@
       "minutes_late_vs_target": 1.7941,
       "scheduled_lock_utc": "2026-10-19T23:15:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-22T23:21:53.497197+00:00",
+      "classification": "on_time",
+      "game_id": "2026_07_NE_CHI",
+      "minutes_before_kickoff": 53.1084,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 6.8916,
+      "scheduled_lock_utc": "2026-10-22T23:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 88,
+  "locked_count": 89,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
