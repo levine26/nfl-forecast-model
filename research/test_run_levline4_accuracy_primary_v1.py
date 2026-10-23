@@ -98,3 +98,15 @@ def test_pre_contract_game_is_audit_only_not_primary_evidence() -> None:
     report = build_report(shadows, history)
     assert report["gate_status"] == "awaiting_graded_post_contract_games"
     assert report["prospective_sample"]["eligible_games"] == 0
+
+
+def test_accuracy_workflow_preserves_untracked_outputs_before_data_branch_checkout() -> None:
+    from pathlib import Path
+
+    workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/research_levline4_accuracy_primary_v1.yml").read_text(encoding="utf-8")
+    persist = workflow.split("- name: Persist accuracy scoreboard away from main", 1)[1]
+    save = persist.index('cp "$DATA_DIR/levline4_accuracy_primary_v1.json" /tmp/levline4_accuracy_primary_v1.json')
+    stash = persist.index('git stash push --include-untracked')
+    checkout = persist.index('git checkout -B market-capture-v2-data')
+    assert save < stash < checkout
+    assert '-- "$DATA_DIR"' in persist
