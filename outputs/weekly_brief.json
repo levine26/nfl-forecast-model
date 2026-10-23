@@ -1,6 +1,12 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_07_TB_CAR",
+      "largest_driver": "Market movement",
+      "pick": "CAR",
+      "pick_delta_pp": -2.0250290564327145
+    },
+    {
       "game_id": "2026_05_BUF_LA",
       "largest_driver": "Market movement",
       "pick": "LA",
@@ -11,42 +17,36 @@
       "largest_driver": "Market movement",
       "pick": "SF",
       "pick_delta_pp": -0.7037037747535946
-    },
-    {
-      "game_id": "2026_04_ATL_NO",
-      "largest_driver": "Market movement",
-      "pick": "NO",
-      "pick_delta_pp": -0.5230298770820707
     }
   ],
-  "generated_utc": "2026-10-22T23:21:54.845682+00:00",
+  "generated_utc": "2026-10-23T18:19:36.694259+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
       "game_id": "2026_07_DAL_PHI",
       "matchup": "DAL @ PHI",
       "pick": "DAL",
-      "pick_prob": 0.6994555916212597,
-      "projected_score": "PHI 21.8 \u2013 DAL 20.7",
-      "pure_market_gap_pp": 17.230810677733892
+      "pick_prob": 0.6994555916212104,
+      "projected_score": "PHI 22.1 \u2013 DAL 20.8",
+      "pure_market_gap_pp": 17.833552819463065
     },
     {
       "confidence": "Lean",
       "game_id": "2026_07_SF_ATL",
       "matchup": "SF @ ATL",
       "pick": "SF",
-      "pick_prob": 0.5578528024841716,
-      "projected_score": "ATL 19.3 \u2013 SF 26.2",
-      "pure_market_gap_pp": 13.443986017022796
+      "pick_prob": 0.5578528024836336,
+      "projected_score": "ATL 19.3 \u2013 SF 26.3",
+      "pure_market_gap_pp": 12.500797696250743
     },
     {
-      "confidence": "Lean",
-      "game_id": "2026_07_NE_CHI",
-      "matchup": "NE @ CHI",
-      "pick": "CHI",
-      "pick_prob": 0.5893757937678881,
-      "projected_score": "CHI 22.1 \u2013 NE 22.5",
-      "pure_market_gap_pp": 12.824000148808523
+      "confidence": "High",
+      "game_id": "2026_07_NYG_HOU",
+      "matchup": "NYG @ HOU",
+      "pick": "HOU",
+      "pick_prob": 0.8126732612536514,
+      "projected_score": "HOU 25.5 \u2013 NYG 18.6",
+      "pure_market_gap_pp": 10.960074408695352
     }
   ],
   "most_uncertain": [
@@ -54,25 +54,25 @@
       "confidence": "Coin Flip",
       "game_id": "2026_07_CIN_BAL",
       "matchup": "CIN @ BAL",
-      "pick": "BAL",
-      "pick_prob": 0.5007182759853918,
-      "projected_score": "BAL 23.5 \u2013 CIN 22.7"
+      "pick": "CIN",
+      "pick_prob": 0.5070836569946794,
+      "projected_score": "BAL 23.7 \u2013 CIN 22.7"
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_07_KC_SEA",
+      "matchup": "KC @ SEA",
+      "pick": "SEA",
+      "pick_prob": 0.5488992369596412,
+      "projected_score": "SEA 24.2 \u2013 KC 21.9"
     },
     {
       "confidence": "Lean",
-      "game_id": "2026_07_CLE_TEN",
-      "matchup": "CLE @ TEN",
-      "pick": "CLE",
-      "pick_prob": 0.5568244190836417,
-      "projected_score": "TEN 19.7 \u2013 CLE 22.4"
-    },
-    {
-      "confidence": "Lean",
-      "game_id": "2026_07_SF_ATL",
-      "matchup": "SF @ ATL",
-      "pick": "SF",
-      "pick_prob": 0.5578528024841716,
-      "projected_score": "ATL 19.3 \u2013 SF 26.2"
+      "game_id": "2026_07_TB_CAR",
+      "matchup": "TB @ CAR",
+      "pick": "CAR",
+      "pick_prob": 0.551136749083361,
+      "projected_score": "CAR 24.3 \u2013 TB 19.8"
     }
   ],
   "strongest": [
@@ -81,24 +81,24 @@
       "game_id": "2026_07_NYG_HOU",
       "matchup": "NYG @ HOU",
       "pick": "HOU",
-      "pick_prob": 0.812673261253836,
-      "projected_score": "HOU 25.4 \u2013 NYG 18.5"
-    },
-    {
-      "confidence": "High",
-      "game_id": "2026_07_IND_MIN",
-      "matchup": "IND @ MIN",
-      "pick": "MIN",
-      "pick_prob": 0.7031109271941319,
-      "projected_score": "MIN 24.7 \u2013 IND 19.5"
+      "pick_prob": 0.8126732612536514,
+      "projected_score": "HOU 25.5 \u2013 NYG 18.6"
     },
     {
       "confidence": "Lean",
       "game_id": "2026_07_DAL_PHI",
       "matchup": "DAL @ PHI",
       "pick": "DAL",
-      "pick_prob": 0.6994555916212597,
-      "projected_score": "PHI 21.8 \u2013 DAL 20.7"
+      "pick_prob": 0.6994555916212104,
+      "projected_score": "PHI 22.1 \u2013 DAL 20.8"
+    },
+    {
+      "confidence": "Solid",
+      "game_id": "2026_07_IND_MIN",
+      "matchup": "IND @ MIN",
+      "pick": "MIN",
+      "pick_prob": 0.6976527132067579,
+      "projected_score": "MIN 24.9 \u2013 IND 19.2"
     }
   ],
   "week": 7
