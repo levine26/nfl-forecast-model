@@ -46,6 +46,8 @@ def test_publisher_status_does_not_count_false_string_as_fst_fallback(tmp_path):
     }])
     games = pd.DataFrame([{"game_id": "2026_06_CHI_GB",
                            "home_team": "GB", "away_team": "CHI"}])
+    (tmp_path / "power_ratings.csv").write_text("team,rank\nGB,1\nCHI,2\n", encoding="utf-8")
+    pd.DataFrame([{"game_id": "2026_05_RECOVERED", "lock_status": "RECOVERED_MISSED_LOCK"}]).to_csv(tmp_path / "prediction_history.csv", index=False)
     write_outputs(
         SimpleNamespace(predictions=predictions, games=games),
         output_dir=tmp_path,
@@ -53,6 +55,8 @@ def test_publisher_status_does_not_count_false_string_as_fst_fallback(tmp_path):
     )
     status = json.loads((tmp_path / "status.json").read_text())
     assert status["fst_fallback_count"] == 0
+    assert status["locked_official_predictions"] == 0  # Recovered history is not a genuine lock.
+    assert status["power_rating_teams"] == 2  # Market-only refresh preserves persisted power feed.
     assert status["market_available_games"] == 1
     assert status["market_missing_or_invalid_games"] == 0
     assert status["final_probability_strategy"] == "F-ST-01-FROZEN-2026"
