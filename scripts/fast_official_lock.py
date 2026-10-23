@@ -29,6 +29,9 @@ IDENTITY = "F-ST-01-FROZEN-2026"
 MAX_CANONICAL_AGE_MINUTES = 90.0
 LOCK_WINDOW_MINUTES = 120.0
 EXPECTED_HEADER = CURRENT_COLUMNS + LOCK_META_COLUMNS
+MARKET_PROVENANCE_COLUMNS = {"market_snapshot_timestamp_utc", "market_snapshot_source", "market_freshness_status"}
+LEGACY_CURRENT_COLUMNS = [c for c in CURRENT_COLUMNS if c not in MARKET_PROVENANCE_COLUMNS]
+LEGACY_HISTORY_HEADER = LEGACY_CURRENT_COLUMNS + LOCK_META_COLUMNS
 
 
 class FastLockError(RuntimeError):
@@ -154,7 +157,7 @@ def write_fast_locks(output_dir: Path, now_utc: datetime) -> list[str]:
     history_path = output_dir / "prediction_history.csv"
     header, current = _read_csv(current_path)
     historic_header, history = _read_csv(history_path)
-    if header != CURRENT_COLUMNS or historic_header != EXPECTED_HEADER:
+    if header not in (CURRENT_COLUMNS, LEGACY_CURRENT_COLUMNS) or historic_header not in (EXPECTED_HEADER, LEGACY_HISTORY_HEADER):
         raise FastLockError("Unexpected canonical/official schema; refusing append")
     status_path = output_dir / "status.json"
     if not status_path.is_file():
@@ -171,14 +174,14 @@ def write_fast_locks(output_dir: Path, now_utc: datetime) -> list[str]:
         raise FastLockError("Official history missing terminal newline; cannot safely append")
     new_rows = io.StringIO(newline="")
     writer = csv.DictWriter(new_rows,fieldnames=historic_header,lineterminator="\n",extrasaction="raise")
-    writer.writerows(additions)
+    writer.writerows([{column: row.get(column, "") for column in historic_header} for row in additions])
     ids = [str(row["game_id"]) for row in additions]
     _atomic_bytes(history_path,original+new_rows.getvalue().encode("utf-8"))
 
     # Publish the real new lock count; keep the numerical generation timestamp
     # untouched since this job has NOT rerun the forecasting engine.
     status = dict(status)
-    status["locked_official_predictions"] = len(history)+len(additions)
+    status["locked_official_predictions"] = sum(row.get("lock_status") == "LOCKED" for row in history) + len(additions)
     status["last_immutable_lock_update_utc"] = now_utc.astimezone(timezone.utc).isoformat()
     _atomic_bytes(status_path,(json.dumps(status,indent=2,sort_keys=True)+"\n").encode("utf-8"))
 
