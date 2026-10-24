@@ -430,12 +430,22 @@ def write_outputs(
     market_available = _status_boolean_series(status_frame, "market_available")
     fallback = _status_boolean_series(status_frame, "fst_fallback")
     freshness = status_frame.get("market_freshness_status", pd.Series("unknown", index=status_frame.index)).fillna("unknown").astype(str)
+    # Market-only refreshes do not supply in-memory power ratings; preserve the
+    # count from the persisted validated feed instead of publishing zero teams.
+    power_count = int(len(getattr(artifacts, "power_ratings", [])))
+    if not power_count and (out / "power_ratings.csv").is_file():
+        try:
+            persisted_teams = pd.read_csv(out / "power_ratings.csv", usecols=["team"])
+            power_count = int(persisted_teams["team"].dropna().astype(str).str.strip().replace("", np.nan).dropna().nunique())
+        except (OSError, ValueError, pd.errors.EmptyDataError):
+            power_count = 0
+    genuine_lock_count = int(official["lock_status"].astype(str).eq("LOCKED").sum())
     status = {
         "status": "healthy",
         "generated_utc": now_utc.isoformat(),
         "games": int(len(status_frame)),
-        "locked_official_predictions": int(len(official)),
-        "power_rating_teams": int(len(getattr(artifacts, "power_ratings", []))),
+        "locked_official_predictions": genuine_lock_count,
+        "power_rating_teams": power_count,
         "next_kickoff_utc": next_kickoff,
         "model_version": str(p["model_version"].iloc[0]) if len(p) and "model_version" in p else None,
         "final_probability_strategy": str(p["final_probability_strategy"].iloc[0]) if len(p) and "final_probability_strategy" in p else None,
