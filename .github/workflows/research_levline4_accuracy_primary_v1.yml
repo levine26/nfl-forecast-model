@@ -87,6 +87,10 @@ jobs:
           cp "$DATA_DIR/levline4_accuracy_primary_v1.json" /tmp/levline4_accuracy_primary_v1.json
           git config user.name 'levline-research-bot'
           git config user.email 'actions@users.noreply.github.com'
+          # Preserve transient generated files in the runner's local stash so
+          # switching to the dedicated research-data branch cannot overwrite them.
+          # The sole intended published artifact was copied to /tmp above.
+          git stash push --include-untracked -m 'Preserve transient accuracy research outputs' -- "$DATA_DIR"
           if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
             git checkout -B market-capture-v2-data origin/research-data/market-capture-v2
           else
