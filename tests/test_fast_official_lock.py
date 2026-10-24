@@ -123,7 +123,7 @@ def test_append_only_history_is_byte_preserving_atomic_and_retry_idempotent(tmp_
     assert receipts["source_prediction_timestamp_utc"]==snapshot()["prediction_timestamp_utc"]
     fresh_status=json.loads((tmp_path/"status.json").read_text())
     assert fresh_status["generated_utc"]==status()["generated_utc"]
-    assert fresh_status["locked_official_predictions"]==2
+    assert fresh_status["locked_official_predictions"]==1  # Recovery snapshots are not genuine locks
 
     assert write_fast_locks(tmp_path,TARGET+timedelta(minutes=1))==[]
     assert (tmp_path/"prediction_history.csv").read_bytes()==after
@@ -137,3 +137,34 @@ def test_rejects_schema_drift_without_touching_history(tmp_path):
     with pytest.raises(FastLockError,match="schema"):
         write_fast_locks(tmp_path,TARGET)
     assert (tmp_path/"prediction_history.csv").read_bytes()==old
+
+
+@pytest.mark.parametrize("legacy_current", [False, True])
+@pytest.mark.parametrize("legacy_history", [False, True])
+def test_validated_market_provenance_schemas_append_without_rewriting(tmp_path, legacy_current, legacy_history):
+    # Existing history bytes must remain unchanged even if its schema predates
+    # the optional market-provenance fields. Canonical and ledger versions may differ.
+    provenance = {"market_snapshot_timestamp_utc", "market_snapshot_source", "market_freshness_status"}
+    current_fields = [c for c in CURRENT_COLUMNS if c not in provenance] if legacy_current else CURRENT_COLUMNS
+    history_fields = ([c for c in CURRENT_COLUMNS if c not in provenance] if legacy_history else CURRENT_COLUMNS) + LOCK_META_COLUMNS
+    current = {c: snapshot().get(c, "") for c in current_fields}
+    _write_csv(tmp_path / "this_week.csv", current_fields, [current])
+    recovery = {c: "" for c in history_fields}
+    recovery.update({"game_id": "2026_04_IND_WAS", "season": "2026", "week": "4", "lock_status": "RECOVERED_MISSED_LOCK"})
+    _write_csv(tmp_path / "prediction_history.csv", history_fields, [recovery])
+    before = (tmp_path / "prediction_history.csv").read_bytes()
+    (tmp_path / "status.json").write_text(json.dumps(status()), encoding="utf-8")
+
+    assert write_fast_locks(tmp_path, TARGET) == ["2026_05_PHI_JAX"]
+    after = (tmp_path / "prediction_history.csv").read_bytes()
+    assert after.startswith(before)
+    with (tmp_path / "prediction_history.csv").open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    assert len(rows) == 2
+    assert list(rows[1]) == history_fields
+    assert rows[1]["lock_status"] == "LOCKED"
+    assert rows[1]["final_home_prob"] == snapshot()["final_home_prob"]
+    assert rows[1]["lock_timestamp_utc"] == TARGET.isoformat()
+    assert json.loads((tmp_path / "status.json").read_text())["locked_official_predictions"] == 1
+    assert write_fast_locks(tmp_path, TARGET + timedelta(minutes=1)) == []
+    assert (tmp_path / "prediction_history.csv").read_bytes() == after
