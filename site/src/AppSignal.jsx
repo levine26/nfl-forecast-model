@@ -325,7 +325,6 @@ function ForecastBoard({games,onOpen,status}) {
       </div>
     </section>
 
-    <TopSignals games={sorted} onOpen={onOpen}/>
 
     <section className="ss-week">
       <div className="ss-section-head">
@@ -615,12 +614,19 @@ export default function App() {
   },[])
 
   useEffect(()=>{;(async()=>{try{
-    const [publicForecasts,runRows,statusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
+    const [publicForecasts,statusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
+      fetchJSON('public_forecasts.json',{games:[]}),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
     ])
     if (!Array.isArray(publicForecasts.games) || !publicForecasts.games.length) throw new Error('Canonical public forecast contract is unavailable.')
-    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setRuns(runRows);setStatus(statusRows);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
+    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setStatus(statusRows);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
   }catch(err){setError(String(err?.message||err))}})()},[])
+
+  useEffect(()=>{
+    if (route.page!=='game') return
+    let active=true
+    fetchCSV('run_history.csv').then(rows=>{if(active)setRuns(rows)})
+    return ()=>{active=false}
+  },[route.page])
 
   const games=forecastPayload.games||[]
   const week=Number(games[0]?.week||0)

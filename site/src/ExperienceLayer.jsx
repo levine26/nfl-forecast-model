@@ -409,9 +409,24 @@ export default function ExperienceLayer() {
   const [route,setRoute]=useState(()=>parseRoute())
   const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},status:{},scoreboard:{}})
   useEffect(()=>{const onHash=()=>setRoute(parseRoute());window.addEventListener('hashchange',onHash);return()=>window.removeEventListener('hashchange',onHash)},[])
-  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,status,scoreboard]=await Promise.all([
-    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),fetchJSON('history_scoreboard.json',{}),
-  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,status,scoreboard})})()},[])
+  useEffect(()=>{
+    let active=true
+    ;(async()=>{
+      const [forecasts,history,autopsies,status,scoreboard]=await Promise.all([
+        fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),fetchJSON('history_scoreboard.json',{}),
+      ])
+      if (active) setData(previous=>({...previous,games:Array.isArray(forecasts.games)?forecasts.games:[],history,autopsies,status,scoreboard}))
+    })()
+    return ()=>{active=false}
+  },[])
+  useEffect(()=>{
+    if (!['forecasts','game'].includes(route.page)) return
+    let active=true
+    fetchCSV('run_history.csv').then(runs=>{
+      if (active) setData(previous=>({...previous,runs}))
+    })
+    return ()=>{active=false}
+  },[route.page])
   useEffect(()=>{
     const classes=['ss-exp-forecasts','ss-exp-game','ss-exp-history','ss-exp-receipt']
     document.body.classList.remove(...classes)
