@@ -2020,6 +2020,28 @@
     ],
     "winner_correct": true
   },
+  "2026_07_IND_MIN": {
+    "actual_score": "MIN 16 \u2013 IND 10",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "total_miss"
+    ],
+    "game_id": "2026_07_IND_MIN",
+    "margin_abs_error": 0.3475898116321216,
+    "matchup": "IND @ MIN",
+    "official_home_prob": 0.7320071599499499,
+    "official_pick": "MIN",
+    "projected_score": "MIN 24.9 \u2013 IND 19.2",
+    "total_abs_error": 18.117612592661036,
+    "what_missed": [
+      "The predicted total finished 18.1 points from the actual total."
+    ],
+    "what_went_right": [
+      "The locked forecast got the winner direction right.",
+      "The predicted margin finished 0.3 points from the actual margin."
+    ],
+    "winner_correct": true
+  },
   "2026_07_NE_CHI": {
     "actual_score": "CHI 30 \u2013 NE 24",
     "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
@@ -2041,5 +2063,28 @@
       "The predicted margin finished 6.4 points from the actual margin."
     ],
     "winner_correct": true
+  },
+  "2026_07_TB_CAR": {
+    "actual_score": "CAR 13 \u2013 TB 43",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "winner_miss",
+      "margin_miss",
+      "total_miss"
+    ],
+    "game_id": "2026_07_TB_CAR",
+    "margin_abs_error": 34.482129682116344,
+    "matchup": "TB @ CAR",
+    "official_home_prob": 0.5713870396476881,
+    "official_pick": "CAR",
+    "projected_score": "CAR 24.3 \u2013 TB 19.8",
+    "total_abs_error": 11.877030669976245,
+    "what_missed": [
+      "The locked forecast missed the outright winner.",
+      "The predicted margin finished 34.5 points from the actual margin.",
+      "The predicted total finished 11.9 points from the actual total."
+    ],
+    "what_went_right": [],
+    "winner_correct": false
   }
 }

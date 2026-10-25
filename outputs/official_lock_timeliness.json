@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 74,
+    "late": 76,
     "on_time": 23,
     "premature": 0
   },
@@ -978,9 +978,29 @@
       "minutes_late_vs_target": 0.0264,
       "scheduled_lock_utc": "2026-10-25T19:05:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-25T20:04:10.188144+00:00",
+      "classification": "late",
+      "game_id": "2026_07_GB_DET",
+      "minutes_before_kickoff": 20.8302,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 39.1698,
+      "scheduled_lock_utc": "2026-10-25T19:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-25T20:04:10.188144+00:00",
+      "classification": "late",
+      "game_id": "2026_07_LA_LV",
+      "minutes_before_kickoff": 20.8302,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 39.1698,
+      "scheduled_lock_utc": "2026-10-25T19:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 97,
+  "locked_count": 99,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
