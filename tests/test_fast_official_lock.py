@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from nfl_forecast.publish import CURRENT_COLUMNS, LOCK_META_COLUMNS
-from scripts.fast_official_lock import FastLockError, plan_fast_locks, write_fast_locks
+from scripts.fast_official_lock import FastLockError, plan_fast_locks, write_fast_locks, seconds_until_nearest_policy_target
 
 IDENTITY="F-ST-01-FROZEN-2026"
 KICKOFF=datetime(2026,10,11,13,30,tzinfo=timezone.utc)
@@ -168,3 +168,28 @@ def test_validated_market_provenance_schemas_append_without_rewriting(tmp_path, 
     assert json.loads((tmp_path / "status.json").read_text())["locked_official_predictions"] == 1
     assert write_fast_locks(tmp_path, TARGET + timedelta(minutes=1)) == []
     assert (tmp_path / "prediction_history.csv").read_bytes() == after
+
+
+def test_early_week7_gate_waits_for_real_t60_target_not_premature():
+    target = datetime(2026, 10, 25, 12, 30, tzinfo=timezone.utc)
+    row = snapshot(target)
+    row.update({"game_id": "2026_07_PIT_NO", "season": "2026", "week": "7",
+                "gameday": "2026-10-25", "gametime": "09:30",
+                "away_team": "PIT", "home_team": "NO", "pick": "PIT"})
+    early = target - timedelta(minutes=2)
+    assert seconds_until_nearest_policy_target([row], [], now_utc=early) == pytest.approx(120)
+    assert plan_fast_locks([row], [], status(), now_utc=early) == []
+    assert seconds_until_nearest_policy_target([row], [], now_utc=target) == 0
+    assert len(plan_fast_locks([row], [], status(), now_utc=target)) == 1
+    assert seconds_until_nearest_policy_target(
+        [row], [], now_utc=target - timedelta(minutes=4)) == 0
+    assert seconds_until_nearest_policy_target(
+        [row], [{"game_id": row["game_id"], "lock_status": "LOCKED"}],
+        now_utc=early) == 0
+
+
+def test_policy_target_wait_rejects_unsafe_duration_and_naive_clock():
+    with pytest.raises(FastLockError):
+        seconds_until_nearest_policy_target([], [], now_utc=TARGET, max_wait_seconds=181)
+    with pytest.raises(FastLockError):
+        seconds_until_nearest_policy_target([], [], now_utc=TARGET.replace(tzinfo=None))
