@@ -291,13 +291,20 @@ export default function ForecastClarity() {
   },[])
 
   useEffect(()=>{;(async()=>{
-    const [forecastPayload,runs,current]=await Promise.all([
+    const [forecastPayload,current]=await Promise.all([
       fetchJSON('public_forecasts.json',{games:[]}),
-      fetchCSV('run_history.csv'),
       fetchCSV('this_week.csv'),
     ])
-    setData({games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],runs,current})
+    setData(previous=>({...previous,games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],current}))
   })()},[])
+  useEffect(()=>{
+    if (route.page!=='game') return
+    let active=true
+    fetchCSV('run_history.csv').then(runs=>{
+      if (active) setData(previous=>({...previous,runs}))
+    })
+    return ()=>{active=false}
+  },[route.page])
 
   useEffect(()=>{
     document.body.classList.toggle('ss-clarity-game',route.page==='game')
