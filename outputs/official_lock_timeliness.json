@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 74,
-    "on_time": 22,
+    "on_time": 23,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -968,9 +968,19 @@
       "minutes_late_vs_target": 0.6808,
       "scheduled_lock_utc": "2026-10-25T16:00:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-25T19:05:01.584332+00:00",
+      "classification": "on_time",
+      "game_id": "2026_07_DEN_ARI",
+      "minutes_before_kickoff": 59.9736,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0264,
+      "scheduled_lock_utc": "2026-10-25T19:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 96,
+  "locked_count": 97,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
