@@ -9,7 +9,7 @@ The usual full pregame model refresh remains independently available.
 
 import argparse
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import io
 import json
@@ -17,6 +17,7 @@ import math
 import os
 from pathlib import Path
 import tempfile
+import time
 from typing import Any
 
 from nfl_forecast.official_lock_policy import official_lock_lead_minutes
@@ -207,12 +208,59 @@ def write_fast_locks(output_dir: Path, now_utc: datetime) -> list[str]:
     return ids
 
 
+
+def seconds_until_nearest_policy_target(
+    current_rows: list[dict[str, Any]],
+    history_rows: list[dict[str, Any]],
+    *,
+    now_utc: datetime,
+    max_wait_seconds: float = 180.0,
+) -> float:
+    """Bridge the T-63 cheap gate to the actual T-60 writer, never lock early.
+
+    A successful gate at T-62 previously ran the writer before T-60, wrote
+    zero receipts, and exited. With skipped cron ticks this silently missed
+    the game. Only wait for an *unlocked* game whose target is imminent.
+    """
+    if now_utc.tzinfo is None or max_wait_seconds < 0 or max_wait_seconds > 180:
+        raise FastLockError("Invalid policy-target wait parameters")
+    locked = {str(row.get("game_id")) for row in history_rows}
+    upcoming = []
+    for row in current_rows:
+        if str(row.get("game_id")) in locked:
+            continue
+        kickoff = kickoff_utc(str(row["gameday"]), str(row["gametime"]))
+        if kickoff <= now_utc:
+            continue
+        target = kickoff - timedelta(minutes=official_lock_lead_minutes(row))
+        seconds = (target - now_utc).total_seconds()
+        if seconds <= 0:
+            # Another game is already eligible: do not delay its real receipt.
+            return 0.0
+        if seconds <= max_wait_seconds:
+            upcoming.append(seconds)
+    return max(upcoming, default=0.0)
+
+
+
 def main() -> int:
     parser=argparse.ArgumentParser(description="Lock only fresh canonical F-ST snapshots inside the official game-specific deadline")
     parser.add_argument("--output-dir",type=Path,default=Path("outputs"))
+    parser.add_argument("--wait-up-to-seconds", type=float, default=0.0,
+                        help="Bounded wait for the real policy target after an early T-63 gate")
     args=parser.parse_args()
-    now=datetime.now(timezone.utc)
     try:
+        if args.wait_up_to_seconds:
+            _, current = _read_csv(args.output_dir / "this_week.csv")
+            _, history = _read_csv(args.output_dir / "prediction_history.csv")
+            wait = seconds_until_nearest_policy_target(
+                current, history, now_utc=datetime.now(timezone.utc),
+                max_wait_seconds=args.wait_up_to_seconds,
+            )
+            if wait:
+                print(f"Early policy gate: waiting {wait:.1f}s until the real lock target", flush=True)
+                time.sleep(wait + 0.2)
+        now=datetime.now(timezone.utc)
         locked=write_fast_locks(args.output_dir,now)
     except (FastLockError, OSError, ValueError, KeyError) as exc:
         parser.exit(1,f"FAIL CLOSED: official lock deadline safety path: {exc}\n")

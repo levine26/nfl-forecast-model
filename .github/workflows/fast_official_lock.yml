@@ -122,7 +122,9 @@ jobs:
               python scripts/refresh_market.py --season 2026 --output-dir outputs
               cache_recovered=true
             fi
-            python scripts/fast_official_lock.py --output-dir outputs
+            # The cheap T-63 gate may run before the T-60 writer becomes eligible.
+            # Wait at most three minutes for the real policy target; never backdate.
+            python scripts/fast_official_lock.py --output-dir outputs --wait-up-to-seconds 180
             if git diff --quiet -- outputs/prediction_history.csv; then
               echo "No new eligible official locks; do not publish anything."
               exit 0
