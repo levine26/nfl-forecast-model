@@ -62,7 +62,7 @@ def test_schedule_coverage_detects_completed_game_without_official_receipt():
     assert _schedule_coverage_for_published_week(published, schedule) == (
         3, ["2026_07_PIT_NO"]
     )
-    assert _schedule_coverage_for_published_week(schedule, schedule) == (3, [])
+    assert _schedule_coverage_for_published_week(schedule[schedule["week"].eq(7)], schedule) == (3, [])
 
 
 def test_missing_game_degrades_status_without_creating_official_receipt(tmp_path):
