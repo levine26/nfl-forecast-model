@@ -244,6 +244,39 @@ def _current_week_publication_rows(
     return published.reset_index(drop=True)
 
 
+
+def _schedule_coverage_for_published_week(
+    published: pd.DataFrame, games: pd.DataFrame | None,
+) -> tuple[int | None, list[str]]:
+    """Compare published game IDs with the schedule, including missed-lock games.
+
+    An already-played game with no immutable receipt can disappear from the
+    unresolved model feed. This must not silently leave status.json healthy.
+    No forecast or historical receipt is reconstructed by this check.
+    """
+    required = {"season", "week", "game_id"}
+    if (published.empty or games is None or games.empty
+            or not required.issubset(published.columns)
+            or not required.issubset(games.columns)):
+        return None, []
+
+    seasons = pd.to_numeric(published["season"], errors="coerce").dropna().unique()
+    weeks = pd.to_numeric(published["week"], errors="coerce").dropna().unique()
+    if len(seasons) != 1 or len(weeks) != 1:
+        return None, []
+
+    schedule = games.loc[
+        pd.to_numeric(games["season"], errors="coerce").eq(seasons[0])
+        & pd.to_numeric(games["week"], errors="coerce").eq(weeks[0]),
+        "game_id",
+    ]
+    expected_ids = set(schedule.dropna().astype(str).str.strip()) - {""}
+    if not expected_ids:
+        return None, []
+    published_ids = set(published["game_id"].dropna().astype(str).str.strip())
+    return len(expected_ids), sorted(expected_ids - published_ids)
+
+
 def _append_run_history(p: pd.DataFrame, path: Path, columns: list[str]) -> None:
     audit = p[columns].copy()
     audit["prediction_id"] = (
@@ -440,8 +473,15 @@ def write_outputs(
         except (OSError, ValueError, pd.errors.EmptyDataError):
             power_count = 0
     genuine_lock_count = int(official["lock_status"].astype(str).eq("LOCKED").sum())
+    expected_week_games, missing_week_game_ids = _schedule_coverage_for_published_week(
+        status_frame, getattr(artifacts, "games", None),
+    )
+    snapshot_degraded = bool(missing_week_game_ids) or bool(fallback.any()) or bool((~market_available).any())
     status = {
-        "status": "healthy",
+        "status": "degraded" if snapshot_degraded else "healthy",
+        "expected_week_games": expected_week_games,
+        "missing_week_game_ids": missing_week_game_ids,
+        "slate_completeness_verified": expected_week_games is not None,
         "generated_utc": now_utc.isoformat(),
         "games": int(len(status_frame)),
         "locked_official_predictions": genuine_lock_count,
