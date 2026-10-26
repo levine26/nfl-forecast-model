@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 76,
+    "late": 77,
     "on_time": 23,
     "premature": 0
   },
@@ -998,9 +998,19 @@
       "minutes_late_vs_target": 39.1698,
       "scheduled_lock_utc": "2026-10-25T19:25:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-25T23:30:40.961477+00:00",
+      "classification": "late",
+      "game_id": "2026_07_KC_SEA",
+      "minutes_before_kickoff": 49.3173,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 10.6827,
+      "scheduled_lock_utc": "2026-10-25T23:20:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 99,
+  "locked_count": 100,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
