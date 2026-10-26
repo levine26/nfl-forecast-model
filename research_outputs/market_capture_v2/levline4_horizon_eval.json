@@ -1,0 +1,568 @@
+{
+  "automatic_promotion": false,
+  "candidate_horizon_metrics": {
+    "L4-FST-H-V1__T-30m": {
+      "brier": 0.2474470216355622,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 17,
+      "gate_sample_ready": false,
+      "log_loss": 0.6864347421711159,
+      "sharpness": 0.12554789037244046,
+      "weeks": 4,
+      "winner_accuracy": 0.5294117647058824
+    },
+    "L4-FST-H-V1__T-45m": {
+      "brier": 0.24891198231524944,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 13,
+      "gate_sample_ready": false,
+      "log_loss": 0.6908551924065024,
+      "sharpness": 0.13155017786052842,
+      "weeks": 2,
+      "winner_accuracy": 0.46153846153846156
+    },
+    "L4-FST-H-V1__T-60m": {
+      "brier": 0.2493898284587169,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 13,
+      "gate_sample_ready": false,
+      "log_loss": 0.6919658901846988,
+      "sharpness": 0.1318798963788643,
+      "weeks": 2,
+      "winner_accuracy": 0.46153846153846156
+    },
+    "L4-MKT-H-V1__T-120m": {
+      "brier": 0.23293152016108845,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 12,
+      "gate_sample_ready": false,
+      "log_loss": 0.6533870483049432,
+      "sharpness": 0.15516060703820544,
+      "weeks": 2,
+      "winner_accuracy": 0.5
+    },
+    "L4-MKT-H-V1__T-30m": {
+      "brier": 0.23906317116314657,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 17,
+      "gate_sample_ready": false,
+      "log_loss": 0.6683835053493772,
+      "sharpness": 0.12154061984308782,
+      "weeks": 4,
+      "winner_accuracy": 0.47058823529411764
+    },
+    "L4-MKT-H-V1__T-45m": {
+      "brier": 0.23724268764080872,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 14,
+      "gate_sample_ready": false,
+      "log_loss": 0.6662595913588338,
+      "sharpness": 0.1251527756014271,
+      "weeks": 3,
+      "winner_accuracy": 0.5
+    },
+    "L4-MKT-H-V1__T-60m": {
+      "brier": 0.23305149317891877,
+      "calibration_intercept": null,
+      "calibration_slope": null,
+      "games": 14,
+      "gate_sample_ready": false,
+      "log_loss": 0.6573684545853256,
+      "sharpness": 0.13147622453001143,
+      "weeks": 3,
+      "winner_accuracy": 0.5
+    }
+  },
+  "candidate_vs_incumbent": {
+    "L4-FST-H-V1__T-30m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.006240037948755186,
+      "brier_week_block_bootstrap": {
+        "ci95_high": -0.00026090906078625464,
+        "ci95_low": -0.015059020936348505,
+        "draws": 10000,
+        "mean_delta": -0.006240037948755186,
+        "seed": 20260912,
+        "week_blocks": 4
+      },
+      "games": 17,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.008438584759278889,
+          "2026-W4": -0.005664384131319507,
+          "2026-W5": -0.0057133188927417,
+          "2026-W6": -0.006930183295231157
+        },
+        "max_remaining_delta": -0.005664384131319507,
+        "weeks": 4
+      }
+    },
+    "L4-FST-H-V1__T-45m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.006626141715180395,
+      "brier_week_block_bootstrap": {
+        "ci95_high": -0.006095189348293652,
+        "ci95_low": -0.012997570117821322,
+        "draws": 10000,
+        "mean_delta": -0.006626141715180395,
+        "seed": 20260912,
+        "week_blocks": 2
+      },
+      "games": 13,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.012997570117821322,
+          "2026-W4": -0.006095189348293652
+        },
+        "max_remaining_delta": -0.006095189348293652,
+        "weeks": 2
+      }
+    },
+    "L4-FST-H-V1__T-60m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.006148295571712919,
+      "brier_week_block_bootstrap": {
+        "ci95_high": -0.00532683729962069,
+        "ci95_low": -0.006216750427720605,
+        "draws": 10000,
+        "mean_delta": -0.006148295571712919,
+        "seed": 20260912,
+        "week_blocks": 2
+      },
+      "games": 13,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.00532683729962069,
+          "2026-W4": -0.006216750427720605
+        },
+        "max_remaining_delta": -0.00532683729962069,
+        "weeks": 2
+      }
+    },
+    "L4-MKT-H-V1__T-120m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.01953716025801838,
+      "brier_week_block_bootstrap": {
+        "ci95_high": -0.0018481034346895311,
+        "ci95_low": -0.021145256332866458,
+        "draws": 10000,
+        "mean_delta": -0.01953716025801838,
+        "seed": 20260912,
+        "week_blocks": 2
+      },
+      "games": 12,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.0018481034346895311,
+          "2026-W4": -0.021145256332866458
+        },
+        "max_remaining_delta": -0.0018481034346895311,
+        "weeks": 2
+      }
+    },
+    "L4-MKT-H-V1__T-30m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.01462388842117083,
+      "brier_week_block_bootstrap": {
+        "ci95_high": -0.008240606702471967,
+        "ci95_low": -0.028105136698363398,
+        "draws": 10000,
+        "mean_delta": -0.01462388842117083,
+        "seed": 20260912,
+        "week_blocks": 4
+      },
+      "games": 17,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.019259540940319692,
+          "2026-W4": -0.01543985960847949,
+          "2026-W5": -0.013771795288919569,
+          "2026-W6": -0.01379082551877302
+        },
+        "max_remaining_delta": -0.013771795288919569,
+        "weeks": 4
+      }
+    },
+    "L4-MKT-H-V1__T-45m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.013106465481282503,
+      "brier_week_block_bootstrap": {
+        "ci95_high": 0.0005398457751295549,
+        "ci95_low": -0.014806586326381328,
+        "draws": 10000,
+        "mean_delta": -0.013106465481282503,
+        "seed": 20260912,
+        "week_blocks": 3
+      },
+      "games": 14,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.0029057404106895557,
+          "2026-W4": -0.01415618173177574,
+          "2026-W7": -0.01362609154934203
+        },
+        "max_remaining_delta": -0.0029057404106895557,
+        "weeks": 3
+      }
+    },
+    "L4-MKT-H-V1__T-60m": {
+      "benchmark": "official_T-120_F-ST",
+      "brier_delta": -0.010772650251664058,
+      "brier_week_block_bootstrap": {
+        "ci95_high": 0.020898921894583672,
+        "ci95_low": -0.014902811048459438,
+        "draws": 10000,
+        "mean_delta": -0.010772650251664058,
+        "seed": 20260912,
+        "week_blocks": 3
+      },
+      "games": 14,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": false,
+        "deltas": {
+          "2026-W3": 0.01400831452910821,
+          "2026-W4": -0.012148831591302273,
+          "2026-W7": -0.013208925032144651
+        },
+        "max_remaining_delta": 0.01400831452910821,
+        "weeks": 3
+      }
+    }
+  },
+  "common_game_horizon_comparison": {
+    "L4-FST-H-V1": {
+      "candidate_id": "L4-FST-H-V1",
+      "common_games": 0,
+      "common_weeks": 0,
+      "contrasts": {},
+      "horizons": {},
+      "required_horizons": [
+        "T-120m",
+        "T-60m",
+        "T-45m",
+        "T-30m"
+      ],
+      "selection_authorized": false
+    },
+    "L4-MKT-H-V1": {
+      "candidate_id": "L4-MKT-H-V1",
+      "common_games": 10,
+      "common_weeks": 1,
+      "contrasts": {
+        "T-120m_to_T-30m": {
+          "definition": "later_horizon_brier_minus_earlier_horizon_brier",
+          "games": 10,
+          "leave_one_week_out": {
+            "all_remaining_negative": null,
+            "deltas": {},
+            "max_remaining_delta": null,
+            "weeks": 1
+          },
+          "mean_brier_delta": -0.002549378787073512,
+          "week_block_bootstrap": {
+            "ci95_high": null,
+            "ci95_low": null,
+            "draws": 0,
+            "mean_delta": -0.002549378787073512,
+            "reason": "fewer_than_two_week_blocks"
+          }
+        },
+        "T-120m_to_T-45m": {
+          "definition": "later_horizon_brier_minus_earlier_horizon_brier",
+          "games": 10,
+          "leave_one_week_out": {
+            "all_remaining_negative": null,
+            "deltas": {},
+            "max_remaining_delta": null,
+            "weeks": 1
+          },
+          "mean_brier_delta": -0.0016582199511921615,
+          "week_block_bootstrap": {
+            "ci95_high": null,
+            "ci95_low": null,
+            "draws": 0,
+            "mean_delta": -0.0016582199511921615,
+            "reason": "fewer_than_two_week_blocks"
+          }
+        },
+        "T-120m_to_T-60m": {
+          "definition": "later_horizon_brier_minus_earlier_horizon_brier",
+          "games": 10,
+          "leave_one_week_out": {
+            "all_remaining_negative": null,
+            "deltas": {},
+            "max_remaining_delta": null,
+            "weeks": 1
+          },
+          "mean_brier_delta": -0.0015810953770056264,
+          "week_block_bootstrap": {
+            "ci95_high": null,
+            "ci95_low": null,
+            "draws": 0,
+            "mean_delta": -0.0015810953770056264,
+            "reason": "fewer_than_two_week_blocks"
+          }
+        },
+        "T-45m_to_T-30m": {
+          "definition": "later_horizon_brier_minus_earlier_horizon_brier",
+          "games": 10,
+          "leave_one_week_out": {
+            "all_remaining_negative": null,
+            "deltas": {},
+            "max_remaining_delta": null,
+            "weeks": 1
+          },
+          "mean_brier_delta": -0.0008911588358813504,
+          "week_block_bootstrap": {
+            "ci95_high": null,
+            "ci95_low": null,
+            "draws": 0,
+            "mean_delta": -0.0008911588358813504,
+            "reason": "fewer_than_two_week_blocks"
+          }
+        },
+        "T-60m_to_T-30m": {
+          "definition": "later_horizon_brier_minus_earlier_horizon_brier",
+          "games": 10,
+          "leave_one_week_out": {
+            "all_remaining_negative": null,
+            "deltas": {},
+            "max_remaining_delta": null,
+            "weeks": 1
+          },
+          "mean_brier_delta": -0.0009682834100678856,
+          "week_block_bootstrap": {
+            "ci95_high": null,
+            "ci95_low": null,
+            "draws": 0,
+            "mean_delta": -0.0009682834100678856,
+            "reason": "fewer_than_two_week_blocks"
+          }
+        },
+        "T-60m_to_T-45m": {
+          "definition": "later_horizon_brier_minus_earlier_horizon_brier",
+          "games": 10,
+          "leave_one_week_out": {
+            "all_remaining_negative": null,
+            "deltas": {},
+            "max_remaining_delta": null,
+            "weeks": 1
+          },
+          "mean_brier_delta": -7.712457418653507e-05,
+          "week_block_bootstrap": {
+            "ci95_high": null,
+            "ci95_low": null,
+            "draws": 0,
+            "mean_delta": -7.712457418653507e-05,
+            "reason": "fewer_than_two_week_blocks"
+          }
+        }
+      },
+      "family_level_inference_required": true,
+      "horizons": {
+        "T-120m": {
+          "brier": 0.23566144697663996,
+          "calibration_intercept": null,
+          "calibration_slope": null,
+          "games": 10,
+          "log_loss": 0.6627419355164447,
+          "sharpness": 0.1406277897167682,
+          "weeks": 1,
+          "winner_accuracy": 0.5
+        },
+        "T-30m": {
+          "brier": 0.23311206818956642,
+          "calibration_intercept": null,
+          "calibration_slope": null,
+          "games": 10,
+          "log_loss": 0.6571411940229334,
+          "sharpness": 0.14195477532752726,
+          "weeks": 1,
+          "winner_accuracy": 0.5
+        },
+        "T-45m": {
+          "brier": 0.2340032270254478,
+          "calibration_intercept": null,
+          "calibration_slope": null,
+          "games": 10,
+          "log_loss": 0.6590505319081522,
+          "sharpness": 0.14167528209435631,
+          "weeks": 1,
+          "winner_accuracy": 0.5
+        },
+        "T-60m": {
+          "brier": 0.2340803515996343,
+          "calibration_intercept": null,
+          "calibration_slope": null,
+          "games": 10,
+          "log_loss": 0.6593531517674196,
+          "sharpness": 0.1416358409345791,
+          "weeks": 1,
+          "winner_accuracy": 0.5
+        }
+      },
+      "required_horizons": [
+        "T-120m",
+        "T-60m",
+        "T-45m",
+        "T-30m"
+      ],
+      "selection_authorized": false,
+      "selection_rule": "Do not select the numerically lowest-Brier horizon in isolation. Horizon selection requires a preregistered joint/multiple-model procedure after the sample gate."
+    }
+  },
+  "evaluation_version": "LEVLINE4-HORIZON-EVAL-V1-PIT-HARDENED",
+  "excluded_invalid_probability_rows": 0,
+  "excluded_tie_rows": 0,
+  "excluded_ungraded_rows": 2,
+  "formal_family_inference_required": false,
+  "gate_status": "ACCUMULATING_PROSPECTIVE_EVIDENCE",
+  "generated_at_utc": "2026-10-26T05:13:28.073965+00:00",
+  "graded_shadow_rows": 100,
+  "horizon_completeness_audit": {
+    "all_four_share_among_games_with_any": 0.43478260869565216,
+    "games_with_all_four_eligible_horizons": 10,
+    "games_with_any_eligible_horizon": 23,
+    "horizon_presence_rate": {
+      "T-120m": 0.5217391304347826,
+      "T-30m": 0.7391304347826086,
+      "T-45m": 0.6956521739130435,
+      "T-60m": 0.6086956521739131
+    },
+    "interpretation": "Descriptive selection audit only. The canonical timing analysis still uses the all-four complete-case intersection and never imputes missing horizons.",
+    "presence_pattern_order": [
+      "T-120m",
+      "T-60m",
+      "T-45m",
+      "T-30m"
+    ],
+    "presence_patterns": {
+      "0001": 4,
+      "0010": 3,
+      "0100": 1,
+      "0111": 3,
+      "1000": 2,
+      "1111": 10
+    }
+  },
+  "horizon_selection_authorized": false,
+  "invalid_incumbent_probability_rows": 0,
+  "minimum_games": 200,
+  "minimum_gate_interpretation": "eligibility_for_formal_inference_not_automatic_selection",
+  "minimum_weeks": 14,
+  "official_history_rows_available": 102,
+  "paired_model_vs_same_horizon_market": {
+    "T-30m": {
+      "benchmark": "L4-MKT-H-V1",
+      "brier_delta": 0.008383850472415647,
+      "brier_week_block_bootstrap": {
+        "ci95_high": 0.02317250907330809,
+        "ci95_low": -0.0022228165890212925,
+        "draws": 10000,
+        "mean_delta": 0.008383850472415647,
+        "seed": 20260912,
+        "week_blocks": 4
+      },
+      "games": 17,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": false,
+        "deltas": {
+          "2026-W3": 0.010820956181040805,
+          "2026-W4": 0.009775475477159984,
+          "2026-W5": 0.00805847639617787,
+          "2026-W6": 0.006860642223541866
+        },
+        "max_remaining_delta": 0.010820956181040805,
+        "weeks": 4
+      },
+      "log_loss_delta": 0.018051236821738623
+    },
+    "T-45m": {
+      "benchmark": "L4-MKT-H-V1",
+      "brier_delta": 0.006999949834161634,
+      "brier_week_block_bootstrap": {
+        "ci95_high": 0.008711396978087677,
+        "ci95_low": -0.013537415892950877,
+        "draws": 10000,
+        "mean_delta": 0.006999949834161634,
+        "seed": 20260912,
+        "week_blocks": 2
+      },
+      "games": 13,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": false,
+        "deltas": {
+          "2026-W3": -0.013537415892950877,
+          "2026-W4": 0.008711396978087677
+        },
+        "max_remaining_delta": 0.008711396978087677,
+        "weeks": 2
+      },
+      "log_loss_delta": 0.015269246982702192
+    },
+    "T-60m": {
+      "benchmark": "L4-MKT-H-V1",
+      "brier_delta": 0.007060629460431733,
+      "brier_week_block_bootstrap": {
+        "ci95_high": 0.00868606062073883,
+        "ci95_low": -0.012444544463253437,
+        "draws": 10000,
+        "mean_delta": 0.007060629460431733,
+        "seed": 20260912,
+        "week_blocks": 2
+      },
+      "games": 13,
+      "leave_one_week_out_brier": {
+        "all_remaining_negative": false,
+        "deltas": {
+          "2026-W3": -0.012444544463253437,
+          "2026-W4": 0.00868606062073883
+        },
+        "max_remaining_delta": 0.00868606062073883,
+        "weeks": 2
+      },
+      "log_loss_delta": 0.015450141332418961
+    }
+  },
+  "primary_metric": "brier",
+  "primary_timing_horizons": [
+    "T-120m",
+    "T-60m",
+    "T-45m",
+    "T-30m"
+  ],
+  "primary_timing_sample": "complete_case_intersection_of_all_four_horizons",
+  "primary_timing_sample_ready": false,
+  "probability_validity_rule": "finite_and_strictly_between_zero_and_one_no_clipping_into_validity",
+  "production_authorized": false,
+  "program": "LEVLINE-4-RESEARCH-V1",
+  "promotion_authorized": false,
+  "raw_shadow_rows_available": 102,
+  "research_only": true,
+  "shadow_rows_available": 102,
+  "strict_horizon_eligibility_audit": {
+    "eligible_rows": 102,
+    "excluded_missing_timing_rows": 0,
+    "excluded_post_cutoff_rows": 0,
+    "excluded_too_early_rows": 0,
+    "input_rows": 102,
+    "maximum_timing_error_minutes": 0.0,
+    "minimum_timing_error_minutes": -7.5,
+    "rule": "nominal T-minus forecasts may use only qualified observations no later than the cutoff",
+    "strict_cutoff": true
+  },
+  "strict_pit_shadow_rows_available": 102,
+  "tie_policy": "exclude_from_binary_win_probability_scoring_and_report_separately"
+}
