@@ -471,7 +471,11 @@ def write_outputs(
         "market_snapshot_timestamp_utc", pd.Series(index=status_frame.index, dtype=object)
     )
     market_time_missing = pd.to_datetime(market_times, errors="coerce", utc=True).isna()
-    market_provenance_missing = market_time_missing | freshness.str.lower().isin(
+    market_sources = status_frame.get(
+        "market_snapshot_source", pd.Series(index=status_frame.index, dtype=object)
+    )
+    market_source_missing = market_sources.isna() | market_sources.astype(str).str.strip().eq("")
+    market_provenance_missing = market_time_missing | market_source_missing | freshness.str.lower().isin(
         ("unknown", "missing", "stale", "invalid")
     )
     # Market-only refreshes do not supply in-memory power ratings; preserve the
