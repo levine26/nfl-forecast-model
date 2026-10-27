@@ -1,43 +1,43 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_08_LV_NYJ",
+      "largest_driver": "Market movement",
+      "pick": "NYJ",
+      "pick_delta_pp": 3.1162599830439897
+    },
+    {
+      "game_id": "2026_08_BAL_BUF",
+      "largest_driver": "Market movement",
+      "pick": "BUF",
+      "pick_delta_pp": 1.0431671621958016
+    },
+    {
       "game_id": "2026_05_BUF_LA",
       "largest_driver": "Market movement",
       "pick": "LA",
       "pick_delta_pp": 0.9960877503218168
-    },
-    {
-      "game_id": "2026_08_PHI_WAS",
-      "largest_driver": "Market movement",
-      "pick": "WAS",
-      "pick_delta_pp": 0.9333029126282422
-    },
-    {
-      "game_id": "2026_06_WAS_SF",
-      "largest_driver": "Market movement",
-      "pick": "SF",
-      "pick_delta_pp": -0.7037037747535946
     }
   ],
-  "generated_utc": "2026-10-27T15:30:15.806902+00:00",
+  "generated_utc": "2026-10-27T19:24:57.053554+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
       "game_id": "2026_08_BAL_BUF",
       "matchup": "BAL @ BUF",
       "pick": "BUF",
-      "pick_prob": 0.5884494243016654,
+      "pick_prob": 0.5988810959236234,
       "projected_score": "BUF 27.9 \u2013 BAL 20.1",
-      "pure_market_gap_pp": 9.93473303791209
+      "pure_market_gap_pp": 9.087353845869718
     },
     {
       "confidence": "Solid",
       "game_id": "2026_08_PHI_WAS",
       "matchup": "PHI @ WAS",
       "pick": "WAS",
-      "pick_prob": 0.6462843387616262,
+      "pick_prob": 0.6614449680389787,
       "projected_score": "WAS 23.8 \u2013 PHI 21.9",
-      "pure_market_gap_pp": 7.23301899885792
+      "pure_market_gap_pp": 8.507623738395154
     },
     {
       "confidence": "Lean",
@@ -54,8 +54,8 @@
       "confidence": "Coin Flip",
       "game_id": "2026_08_LV_NYJ",
       "matchup": "LV @ NYJ",
-      "pick": "LV",
-      "pick_prob": 0.5177992813922998,
+      "pick": "NYJ",
+      "pick_prob": 0.5133633184381401,
       "projected_score": "NYJ 22.7 \u2013 LV 21.3"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_08_IND_JAX",
       "matchup": "IND @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.7506012711620491,
+      "pick_prob": 0.7641977722314263,
       "projected_score": "JAX 29.3 \u2013 IND 18.1"
     }
   ],
