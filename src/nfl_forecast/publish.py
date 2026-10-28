@@ -463,6 +463,21 @@ def write_outputs(
     market_available = _status_boolean_series(status_frame, "market_available")
     fallback = _status_boolean_series(status_frame, "fst_fallback")
     freshness = status_frame.get("market_freshness_status", pd.Series("unknown", index=status_frame.index)).fillna("unknown").astype(str)
+    # A quoted market price without a verifiable observation time is not a
+    # freshness-qualified snapshot. Full-model rebuilds may temporarily lack
+    # these fields until the market-only refresh completes; report degraded
+    # rather than claiming the new generation is fully healthy.
+    market_times = status_frame.get(
+        "market_snapshot_timestamp_utc", pd.Series(index=status_frame.index, dtype=object)
+    )
+    market_time_missing = pd.to_datetime(market_times, errors="coerce", utc=True).isna()
+    market_sources = status_frame.get(
+        "market_snapshot_source", pd.Series(index=status_frame.index, dtype=object)
+    )
+    market_source_missing = market_sources.isna() | market_sources.astype(str).str.strip().eq("")
+    market_provenance_missing = market_time_missing | market_source_missing | freshness.str.lower().isin(
+        ("unknown", "missing", "stale", "invalid")
+    )
     # Market-only refreshes do not supply in-memory power ratings; preserve the
     # count from the persisted validated feed instead of publishing zero teams.
     power_count = int(len(getattr(artifacts, "power_ratings", [])))
@@ -476,7 +491,8 @@ def write_outputs(
     expected_week_games, missing_week_game_ids = _schedule_coverage_for_published_week(
         status_frame, getattr(artifacts, "games", None),
     )
-    snapshot_degraded = bool(missing_week_game_ids) or bool(fallback.any()) or bool((~market_available).any())
+    snapshot_degraded = (bool(missing_week_game_ids) or bool(fallback.any())
+                         or bool((~market_available).any()) or bool(market_provenance_missing.any()))
     status = {
         "status": "degraded" if snapshot_degraded else "healthy",
         "expected_week_games": expected_week_games,
@@ -493,6 +509,7 @@ def write_outputs(
         "fst_artifact_training_data_sha256": str(p["fst_artifact_training_data_sha256"].iloc[0]) if len(p) and "fst_artifact_training_data_sha256" in p else None,
         "market_available_games": int(market_available.sum()),
         "market_missing_or_invalid_games": int((~market_available).sum()),
+        "market_provenance_missing_games": int(market_provenance_missing.sum()),
         "fst_fallback_count": int(fallback.sum()),
         "market_snapshot_timestamp_utc": str(p["market_snapshot_timestamp_utc"].iloc[0]) if len(p) and "market_snapshot_timestamp_utc" in p else None,
         "market_snapshot_source": str(p["market_snapshot_source"].iloc[0]) if len(p) and "market_snapshot_source" in p else None,

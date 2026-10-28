@@ -97,3 +97,51 @@ def test_missing_game_degrades_status_without_creating_official_receipt(tmp_path
     assert status["slate_completeness_verified"] is True
     assert status["locked_official_predictions"] == 0
     assert "2026_07_PIT_NO" not in (tmp_path / "this_week.csv").read_text()
+
+
+
+def test_complete_slate_requires_timestamped_market_provenance_for_healthy_status(tmp_path):
+    predictions = pd.DataFrame([{
+        "game_id": "2026_08_CAR_GB", "season": 2026, "week": 8,
+        "gameday": "2026-10-29", "gametime": "20:15",
+        "home_team": "GB", "away_team": "CAR",
+        "final_home_prob": 0.61, "pick": "GB",
+        "market_home_prob": 0.62, "market_available": True,
+        "fst_fallback": False,
+        "final_probability_strategy": "F-ST-01-FROZEN-2026",
+        "fst_artifact_id": "F-ST-01-FROZEN-2026",
+        "model_version": "0.9.0-fst", "snapshot_type": "MARKET",
+        "prediction_timestamp_utc": "2026-10-27T15:30:00+00:00",
+    }])
+    games = predictions[["game_id", "season", "week", "home_team", "away_team"]].copy()
+    now = datetime(2026, 10, 27, 15, 30, tzinfo=timezone.utc)
+    write_outputs(
+        SimpleNamespace(predictions=predictions, games=games),
+        output_dir=tmp_path / "unknown", now_utc=now,
+    )
+    missing = json.loads((tmp_path / "unknown" / "status.json").read_text())
+    assert missing["games"] == missing["expected_week_games"] == 1
+    assert missing["slate_completeness_verified"] is True
+    assert missing["market_available_games"] == 1
+    assert missing["market_provenance_missing_games"] == 1
+    assert missing["status"] == "degraded"
+
+    predictions["market_snapshot_timestamp_utc"] = "2026-10-27T15:20:00+00:00"
+    predictions["market_snapshot_source"] = "nflverse_games.csv_moneyline"
+    predictions["market_freshness_status"] = "refreshed_this_run"
+    write_outputs(
+        SimpleNamespace(predictions=predictions, games=games),
+        output_dir=tmp_path / "fresh", now_utc=now,
+    )
+    fresh = json.loads((tmp_path / "fresh" / "status.json").read_text())
+    assert fresh["market_provenance_missing_games"] == 0
+    assert fresh["status"] == "healthy"
+
+    predictions["market_snapshot_timestamp_utc"] = "not-a-timestamp"
+    write_outputs(
+        SimpleNamespace(predictions=predictions, games=games),
+        output_dir=tmp_path / "invalid", now_utc=now,
+    )
+    invalid = json.loads((tmp_path / "invalid" / "status.json").read_text())
+    assert invalid["market_provenance_missing_games"] == 1
+    assert invalid["status"] == "degraded"
