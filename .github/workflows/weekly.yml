@@ -124,6 +124,21 @@ jobs:
 
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/run_week.py --season 2026 --snapshot EARLY
+            # Full-model output has no independently observed market timestamp.
+            # Refresh from the actual market source through the existing frozen F-ST
+            # market pathway, then validate BEFORE committing any output.
+            # Failed observation leaves the previous published snapshot untouched.
+            python scripts/refresh_market.py --season 2026
+            python - <<'PY'
+            import json
+            from pathlib import Path
+            status = json.loads(Path("outputs/status.json").read_text())
+            if (status.get("status") != "healthy"
+                    or status.get("slate_completeness_verified") is not True
+                    or status.get("market_provenance_missing_games", 1) != 0
+                    or status.get("fst_fallback_count", 1) != 0):
+                raise SystemExit("Refusing mixed-generation or unqualified market publication: " + str(status))
+            PY
             # Forecast and official lock publication has no editorial dependency.
             git add outputs/
 
