@@ -15,7 +15,8 @@ for (const [name,width,height] of [['desktop',1440,1000],['mobile',390,844]]) {
     await expect(clarity.getByText('PROBABILITY-IMPLIED LINE',{exact:true})).toBeVisible()
     await expect(clarity.getByText('SPORTSBOOK SPREAD',{exact:true})).toBeVisible()
     await expect(clarity.getByText('WIN-PROBABILITY DIFFERENCE',{exact:true})).toBeVisible()
-    await expect(clarity.getByText('MODEL SCORE ESTIMATE',{exact:true})).toBeVisible()
+    await expect(clarity.getByText('ILLUSTRATIVE SCORE',{exact:true})).toBeVisible()
+    await expect(clarity.getByText('Win-probability-aligned display; not the independent ATS expected-margin score',{exact:true})).toBeVisible()
     await expect(clarity.getByText('FORECAST TIER',{exact:true})).toBeVisible()
     await expect(clarity.getByText('MODEL AGREEMENT',{exact:true})).toBeVisible()
 
