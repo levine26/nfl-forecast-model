@@ -209,8 +209,9 @@ def build_history_scoreboard(official: pd.DataFrame) -> dict[str, Any]:
         "total_mae": total_mae,
         "status": "live_forward_test" if graded_count else "official_locks_waiting_for_results",
         "notes": [
-            "Only immutable official T-120 locks are included.",
-            "Brier comparison uses games where both LevLine and market probability are available.",
+            "Only genuine immutable LOCKED official receipts are included; 2026 Weeks 1–5 target T−120 and Week 6 onward T−60.",
+            "The Brier difference uses paired games with both LevLine and market probabilities; positive market-minus-model means LevLine has the lower Brier score.",
+            "Stored market probabilities are not necessarily timestamp-qualified against the original lock; inspect market provenance separately.",
             "No ROI is shown unless a separately defined, timestamped betting rule is being tracked.",
         ],
     }

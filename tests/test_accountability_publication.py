@@ -56,6 +56,9 @@ def test_history_scoreboard_uses_only_locked_graded_forecasts():
     assert board["market_brier"] is not None
     assert board["status"] == "live_forward_test"
     assert any("ROI" in note for note in board["notes"])
+    assert any("Weeks 1–5" in note and "Week 6 onward T−60" in note for note in board["notes"])
+    assert any("paired games" in note for note in board["notes"])
+    assert any("timestamp-qualified" in note for note in board["notes"])
 
 
 def test_history_scoreboard_waits_cleanly_before_first_lock():
