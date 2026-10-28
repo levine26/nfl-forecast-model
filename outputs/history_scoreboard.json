@@ -1,14 +1,15 @@
 {
   "brier": 0.23975764818056683,
   "brier_vs_market": 7.279049156627693e-05,
-  "generated_utc": "2026-10-27T19:24:57.084755+00:00",
+  "generated_utc": "2026-10-28T15:12:00.715839+00:00",
   "graded": 101,
   "locked": 101,
   "margin_mae": 9.82686520637917,
   "market_brier": 0.2398304386721331,
   "notes": [
-    "Only immutable official T-120 locks are included.",
-    "Brier comparison uses games where both LevLine and market probability are available.",
+    "Only genuine immutable LOCKED official receipts are included; 2026 Weeks 1\u20135 target T\u2212120 and Week 6 onward T\u221260.",
+    "The Brier difference uses paired games with both LevLine and market probabilities; positive market-minus-model means LevLine has the lower Brier score.",
+    "Stored market probabilities are not necessarily timestamp-qualified against the original lock; inspect market provenance separately.",
     "No ROI is shown unless a separately defined, timestamped betting rule is being tracked."
   ],
   "record": "62-39",
