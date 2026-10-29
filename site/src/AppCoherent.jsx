@@ -1,14 +1,9 @@
-
 import AppSignal from './AppSignal.jsx'
 import SignalEnhancements from './SignalEnhancements.jsx'
 import ForecastClarity from './ForecastClarity.jsx'
 import ForecastHelp from './ForecastHelp.jsx'
 import ExperienceLayer from './ExperienceLayer.jsx'
 import ExperienceDomFixes from './ExperienceDomFixes.jsx'
-
-function MobileSafeDomFixes() {
-  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? null : <ExperienceDomFixes/>
-}
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
 import BetTracker from './BetTracker.jsx'
 import AtsValueLayer from './AtsValueLayer.jsx'
@@ -71,8 +66,7 @@ export default function AppCoherent() {
     <ForecastClarity/>
     <AtsValueLayer/>
     <ForecastHelp/>
-    {/* The legacy DOM bridge's root-wide MutationObserver can recursively mutate mobile DOM. */}
-    <MobileSafeDomFixes/>
+    <ExperienceDomFixes/>
     <ExperienceLayer/>
     <HistoryReceiptDetails/>
     <BetTracker/>
