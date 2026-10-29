@@ -1,10 +1,14 @@
-import { useState } from 'react'
+
 import AppSignal from './AppSignal.jsx'
 import SignalEnhancements from './SignalEnhancements.jsx'
 import ForecastClarity from './ForecastClarity.jsx'
 import ForecastHelp from './ForecastHelp.jsx'
 import ExperienceLayer from './ExperienceLayer.jsx'
 import ExperienceDomFixes from './ExperienceDomFixes.jsx'
+
+function MobileSafeDomFixes() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? null : <ExperienceDomFixes/>
+}
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
 import BetTracker from './BetTracker.jsx'
 import AtsValueLayer from './AtsValueLayer.jsx'
@@ -61,21 +65,16 @@ import './signal-polish.css'
  * <details><summary>Model Consensus
  */
 export default function AppCoherent() {
-  // Mobile WebKit can terminate the page when all DOM-observing enhancement
-  // layers mount together. Keep the canonical forecast surface available while
-  // those optional desktop-only overlays are isolated from mobile startup.
-  const [mobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches)
   return <>
     <AppSignal/>
-    {!mobile && <>
     <SignalEnhancements/>
     <ForecastClarity/>
     <AtsValueLayer/>
     <ForecastHelp/>
-    <ExperienceDomFixes/>
+    {/* The legacy DOM bridge's root-wide MutationObserver can recursively mutate mobile DOM. */}
+    <MobileSafeDomFixes/>
     <ExperienceLayer/>
     <HistoryReceiptDetails/>
     <BetTracker/>
-    </>}
   </>
 }
