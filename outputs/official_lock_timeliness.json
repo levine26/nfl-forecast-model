@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 77,
-    "on_time": 24,
+    "on_time": 25,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1018,9 +1018,19 @@
       "minutes_late_vs_target": 4.5143,
       "scheduled_lock_utc": "2026-10-26T23:15:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-10-29T23:15:00.200888+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_CAR_GB",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-10-29T23:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 101,
+  "locked_count": 102,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
