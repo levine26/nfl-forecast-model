@@ -395,7 +395,7 @@ function PresentationTextPass({route}) {
     const apply=()=>{
       document.querySelectorAll('.ss-desktop-nav button').forEach(button=>{if(button.textContent==='Power')button.textContent='Power Rankings';if(button.textContent==='Methodology')button.textContent='How LevLine Works'})
       document.querySelectorAll('.ss-method-flow article b').forEach(node=>{if(node.textContent==='Probability-Implied Line')node.textContent='LevLine Fair Spread'})
-      document.querySelectorAll('.ss-how-link').forEach(node=>{node.textContent='How LevLine Works →'})
+      document.querySelectorAll('.ss-how-link').forEach(node=>{if(node.textContent!=='How LevLine Works →')node.textContent='How LevLine Works →'})
     }
     apply()
     const observer=new MutationObserver(apply)
