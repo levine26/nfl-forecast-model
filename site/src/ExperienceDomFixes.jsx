@@ -47,18 +47,7 @@ export default function ExperienceDomFixes() {
     }
 
     apply()
-    // Coalesce React DOM mutations into one frame, and disconnect while
-    // applying DOM compatibility changes to avoid observer feedback loops.
-    let frame=0
-    const observer=new MutationObserver(()=>{
-      if (frame) return
-      frame=window.requestAnimationFrame(()=>{
-        frame=0
-        observer.disconnect()
-        apply()
-        observer.observe(document.getElementById('root')||document.body,{childList:true,subtree:true})
-      })
-    })
+    const observer=new MutationObserver(apply)
     observer.observe(document.getElementById('root')||document.body,{childList:true,subtree:true})
     const onResize=()=>apply()
     const onHash=()=>apply()
@@ -66,7 +55,6 @@ export default function ExperienceDomFixes() {
     window.addEventListener('hashchange',onHash)
     return()=>{
       observer.disconnect()
-      if (frame) window.cancelAnimationFrame(frame)
       window.removeEventListener('resize',onResize)
       window.removeEventListener('hashchange',onHash)
     }
