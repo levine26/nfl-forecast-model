@@ -17,13 +17,13 @@ for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
     const rows = width <= 768 ? page.locator('.ss-exp-mobile-board:visible > button') : page.locator('.ss-exp-board-rows:visible > button')
     await expect(rows.first()).toBeVisible()
     await rows.first().click()
-    await expect(page).toHaveURL(/#\\/game\\//)
+    await expect(page).toHaveURL(/#[/]game[/]/)
     await expect(page.locator('.ss-clarity-shell:visible')).toBeVisible()
     // Let asynchronous portal/observer updates settle and verify that the page
     // remains capable of navigating (not trapped in a mutation microtask loop).
     await page.waitForTimeout(350)
     await page.evaluate(() => { window.location.hash = '#/forecasts' })
-    await expect(page).toHaveURL(/#\\/forecasts/)
+    await expect(page).toHaveURL(/#[/]forecasts/)
     await expect(rows.first()).toBeVisible()
   })
 }
