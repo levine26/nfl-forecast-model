@@ -236,7 +236,7 @@ function ForecastClarityCard({game,runs,diagnostic}) {
         <article><span>PROBABILITY-IMPLIED LINE</span><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b><small>Translation of win probability; not an independent ATS margin</small></article>
         <article><span>SPORTSBOOK SPREAD</span><b>{lineText(game.market_margin_home,game.home_team,game.away_team)}</b><small>Current consensus market line</small></article>
         <article className="edge"><span>WIN-PROBABILITY DIFFERENCE</span><b>{game.official_winner} {pp(edge)}</b><small>LevLine {pct(winnerP)} − Market {pct(marketP)}</small></article>
-        <article><span>MODEL SCORE ESTIMATE</span><b>{scoreText(game)}</b><small>Approximate score consistent with the forecast</small></article>
+        <article><span>ILLUSTRATIVE SCORE</span><b>{scoreText(game)}</b><small>Win-probability-aligned display; not the independent ATS expected-margin score</small></article>
       </div>
       <div className="ss-clarity-freshness"><span><b>Forecast</b> {game.immutable?'locked':'updated'} {formatTime(stamp)}</span><span><b>Market updated</b> {formatTime(game.market_timestamp_utc)}</span></div>
     </div>
@@ -256,7 +256,7 @@ function ForecastClarityCard({game,runs,diagnostic}) {
         <article><b>Probability-implied line</b><p>A presentation translation of LevLine's win probability, not the independent ATS expected margin.</p></article>
         <article><b>Sportsbook spread</b><p>The current consensus market line used for comparison.</p></article>
         <article><b>Win-probability difference</b><p>LevLine probability minus market-implied probability, expressed in percentage points.</p></article>
-        <article><b>Model score estimate</b><p>An approximate score consistent with the forecast, not a literal exact-score prediction.</p></article>
+        <article><b>Illustrative score</b><p>A rounded score aligned with the win-probability-implied line, not an exact-score prediction or the independent ATS expected-margin projection. Those two targets can favor different teams.</p></article>
         <article><b>Model agreement</b><p>A supporting diagnostic describing how tightly component views line up with one another.</p></article>
       </div>
     </details>
