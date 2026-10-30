@@ -321,7 +321,7 @@ export default function SignalEnhancements() {
 
   useEffect(()=>{;(async()=>{
     const [forecastPayload,runs,history,ratings,status,current]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchCSV('power_ratings.csv'),fetchJSON('status.json',{}),fetchCSV('this_week.csv'),
+      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history_recent.csv'),fetchCSV('prediction_history.csv'),fetchCSV('power_ratings.csv'),fetchJSON('status.json',{}),fetchCSV('this_week.csv'),
     ])
     setData({games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],runs,history,ratings,status,current})
   })()},[])
