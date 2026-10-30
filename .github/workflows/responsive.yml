@@ -53,13 +53,16 @@ jobs:
         run: node --test tests/editorialReadStatus.test.mjs
       - name: Install browser
         working-directory: site
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
       - name: Build dashboard
         working-directory: site
         run: npm run build
       - name: Test first-class viewports
         working-directory: site
         run: npm run test:responsive
+      - name: Verify WebKit mobile rendering and bounded data requests
+        working-directory: site
+        run: npx playwright test --browser=webkit tests/mobile-safari-observer.spec.js
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
