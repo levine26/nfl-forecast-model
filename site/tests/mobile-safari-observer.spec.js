@@ -13,9 +13,15 @@ test('presentation observer never unconditionally rewrites unchanged help text',
 for (const [name,width,height] of [['mobile',390,844],['desktop',1440,900]]) {
   test(`${name}: homepage and game route remain interactive without recursive DOM churn`, async ({page}) => {
     await page.setViewportSize({width,height})
+    const dataRequests = []
+    page.on('request', request => {
+      if (request.url().includes('/data/')) dataRequests.push(request.url())
+    })
     await page.goto('./')
     const rows = width <= 768 ? page.locator('.ss-exp-mobile-board:visible > button') : page.locator('.ss-exp-board-rows:visible > button')
     await expect(rows.first()).toBeVisible()
+    await expect.poll(() => dataRequests.some(url => url.endsWith('/run_history_recent.csv'))).toBe(true)
+    expect(dataRequests.some(url => url.endsWith('/run_history.csv'))).toBe(false)
     await rows.first().click()
     await expect(page).toHaveURL(/#[/]game[/]/)
     await expect(page.locator('.ss-clarity-shell:visible')).toBeVisible()
