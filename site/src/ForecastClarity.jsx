@@ -293,7 +293,7 @@ export default function ForecastClarity() {
   useEffect(()=>{;(async()=>{
     const [forecastPayload,runs,current]=await Promise.all([
       fetchJSON('public_forecasts.json',{games:[]}),
-      fetchCSV('run_history.csv'),
+      fetchCSV('run_history_recent.csv'),
       fetchCSV('this_week.csv'),
     ])
     setData({games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],runs,current})
