@@ -129,16 +129,11 @@ jobs:
             # market pathway, then validate BEFORE committing any output.
             # Failed observation leaves the previous published snapshot untouched.
             python scripts/refresh_market.py --season 2026
-            python - <<'PY'
-          import json
-          from pathlib import Path
-          status = json.loads(Path("outputs/status.json").read_text())
-          if (status.get("status") != "healthy"
-                  or status.get("slate_completeness_verified") is not True
-                  or status.get("market_provenance_missing_games", 1) != 0
-                  or status.get("fst_fallback_count", 1) != 0):
-              raise SystemExit("Refusing mixed-generation or unqualified market publication: " + str(status))
-          PY
+            # Require fresh, timestamped markets for every UNLOCKED game.
+            # Immutable completed-game receipts can retain missing historical
+            # provenance without blocking the remaining verified live slate.
+            # Never relabel those legacy rows as fresh or mutate their locks.
+            python scripts/validate_market_publication.py --output-dir outputs
             # Forecast and official lock publication has no editorial dependency.
             git add outputs/
 
