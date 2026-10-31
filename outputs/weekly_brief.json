@@ -13,14 +13,23 @@
       "pick_delta_pp": -0.7037037747535946
     },
     {
-      "game_id": "2026_04_ATL_NO",
+      "game_id": "2026_08_PHI_WAS",
       "largest_driver": "Market movement",
-      "pick": "NO",
-      "pick_delta_pp": -0.5230298770820707
+      "pick": "WAS",
+      "pick_delta_pp": 0.6336519505476756
     }
   ],
-  "generated_utc": "2026-10-30T19:12:16.281566+00:00",
+  "generated_utc": "2026-10-31T18:30:25.879185+00:00",
   "market_disagreements": [
+    {
+      "confidence": "Lean",
+      "game_id": "2026_08_BAL_BUF",
+      "matchup": "BAL @ BUF",
+      "pick": "BUF",
+      "pick_prob": 0.5654658914032692,
+      "projected_score": "BUF 27.8 \u2013 BAL 19.9",
+      "pure_market_gap_pp": 11.34147358711054
+    },
     {
       "confidence": "High",
       "game_id": "2026_08_PHI_WAS",
@@ -32,21 +41,12 @@
     },
     {
       "confidence": "Lean",
-      "game_id": "2026_08_BAL_BUF",
-      "matchup": "BAL @ BUF",
-      "pick": "BUF",
-      "pick_prob": 0.5721886325303789,
-      "projected_score": "BUF 27.8 \u2013 BAL 19.9",
-      "pure_market_gap_pp": 10.793547235502388
-    },
-    {
-      "confidence": "Lean",
       "game_id": "2026_08_MIN_DET",
       "matchup": "MIN @ DET",
       "pick": "DET",
       "pick_prob": 0.5918560301424225,
       "projected_score": "DET 23.4 \u2013 MIN 22.1",
-      "pure_market_gap_pp": 7.722042955995145
+      "pure_market_gap_pp": 7.722042955995134
     }
   ],
   "most_uncertain": [
@@ -89,7 +89,7 @@
       "game_id": "2026_08_IND_JAX",
       "matchup": "IND @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.7875965570271378,
+      "pick_prob": 0.7927813080348171,
       "projected_score": "JAX 29.7 \u2013 IND 18.0"
     },
     {
