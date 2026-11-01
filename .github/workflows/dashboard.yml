@@ -47,6 +47,9 @@ on:
       - 'Hourly NFL market refresh'
       - 'Sunday Signal bet price capture'
       - 'Pregame NFL refresh'
+      # GITHUB_TOKEN commits by the guarded fast-lock worker do not emit a
+      # downstream push event. A completed worker is a separate Pages heartbeat.
+      - 'Sunday Signal fast official T-120 lock'
     types: [completed]
   workflow_dispatch:
 
@@ -64,7 +67,10 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # A no-op fast-lock heartbeat must not rebuild Pages every five minutes.
+    # On workflow_run, github.sha is current default-branch HEAD, while
+    # workflow_run.head_sha is the source revision before the lock worker.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.name != 'Sunday Signal fast official T-120 lock' || github.event.workflow_run.head_sha != github.sha))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -154,7 +160,7 @@ jobs:
           path: site/dist
 
   deploy:
-    if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_run') && github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_run') && github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.name != 'Sunday Signal fast official T-120 lock' || github.event.workflow_run.head_sha != github.sha)))
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
