@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 77,
-    "on_time": 25,
+    "on_time": 33,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1028,9 +1028,89 @@
       "minutes_late_vs_target": 0.0033,
       "scheduled_lock_utc": "2026-10-29T23:15:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_ARI_DAL",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_ATL_TB",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_BAL_BUF",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_CLE_PIT",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_IND_JAX",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_LV_NYJ",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_MIN_DET",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T17:00:00.200809+00:00",
+      "classification": "on_time",
+      "game_id": "2026_08_TEN_CIN",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 102,
+  "locked_count": 110,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
