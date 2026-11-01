@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 77,
+    "late": 79,
     "on_time": 33,
     "premature": 0
   },
@@ -1108,9 +1108,29 @@
       "minutes_late_vs_target": 0.0033,
       "scheduled_lock_utc": "2026-11-01T17:00:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T21:10:28.441745+00:00",
+      "classification": "late",
+      "game_id": "2026_08_KC_DEN",
+      "minutes_before_kickoff": 14.526,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 45.474,
+      "scheduled_lock_utc": "2026-11-01T20:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-01T21:10:28.441745+00:00",
+      "classification": "late",
+      "game_id": "2026_08_NE_MIA",
+      "minutes_before_kickoff": 14.526,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 45.474,
+      "scheduled_lock_utc": "2026-11-01T20:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 110,
+  "locked_count": 112,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
