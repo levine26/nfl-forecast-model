@@ -36,3 +36,16 @@ def test_build_gate_includes_this_regression_and_deploy_needs_build():
     assert "  deploy:\n" in content
     assert "    needs: build\n" in content
     assert "    environment:\n      name: github-pages\n" in content
+
+
+def test_fast_official_lock_receipt_triggers_pages_without_noop_deploy_storm():
+    content = _workflow()
+    trigger = content.split("  workflow_run:\n", 1)[1].split("  workflow_dispatch:", 1)[0]
+    assert "'Sunday Signal fast official T-120 lock'" in trigger
+    # GitHub's Actions token suppresses downstream push events; this event
+    # explicitly republishes persisted receipts after a successful lock run.
+    assert "github.event.workflow_run.conclusion == 'success'" in content
+    assert content.count("github.event.workflow_run.head_sha != github.sha") == 2
+    assert content.count("github.event.workflow_run.name != 'Sunday Signal fast official T-120 lock'") == 2
+    # A no-op five-minute heartbeat must not start a costly Pages build.
+    assert "github.event.workflow_run.head_sha != github.sha" in content.split("  build:\n", 1)[1].split("  deploy:\n", 1)[0]
