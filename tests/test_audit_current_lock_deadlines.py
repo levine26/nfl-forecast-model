@@ -115,6 +115,10 @@ def test_missing_lock_after_kickoff_is_visible_during_bounded_window():
     beyond = audit_current_deadlines(slate(), [], now_utc=KICKOFF+timedelta(hours=4))
     assert beyond["status"] == "no_active_lock_timing_violation"
     assert beyond["counts"]["missing_lock_outside_active_watch_window"] == 2
+    assert beyond["historical_missing_count"] == 2
+    assert set(beyond["historical_missing_receipts"]) == {"2026_05_PHI_JAX", "2026_05_DEN_LAC"}
+    assert beyond["accountability_status"] == "missing_official_receipts"
+    assert beyond["actionable_issues"] == {}
 
 
 def test_recorded_missed_lock_recovery_not_confused_with_on_time_lock():
@@ -157,3 +161,28 @@ def test_stalled_production_lock_job_has_a_bounded_timeout():
     lock_block = text.split("\n  lock:\n", 1)[1]
     assert "    timeout-minutes: 15" in lock_block
     assert "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in text
+
+
+def test_expired_missed_lock_still_emits_accountability_warning(tmp_path, monkeypatch, capsys):
+    import csv
+    import json
+    import sys
+    from scripts.audit_current_lock_deadlines import main as run_audit
+
+    current, history, output = (tmp_path / name for name in ("current.csv", "history.csv", "audit.json"))
+    with current.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=["game_id", "gameday", "gametime"])
+        writer.writeheader()
+        writer.writerows(slate())
+    with history.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=["game_id", "lock_status", "lock_timestamp_utc"])
+        writer.writeheader()
+        writer.writerow(lock("2026_05_DEN_LAC"))
+    monkeypatch.setattr(sys, "argv", ["audit", "--current", str(current), "--history", str(history),
+                                     "--output", str(output), "--now-utc",
+                                     (KICKOFF + timedelta(hours=4)).isoformat()])
+    run_audit()
+    report = json.loads(output.read_text())
+    assert report["status"] == "no_active_lock_timing_violation"
+    assert report["historical_missing_receipts"] == ["2026_05_PHI_JAX"]
+    assert "missing_lock_outside_active_watch_window" in capsys.readouterr().out
