@@ -2447,6 +2447,28 @@
     ],
     "winner_correct": true
   },
+  "2026_08_KC_DEN": {
+    "actual_score": "DEN 28 \u2013 KC 24",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "winner_miss"
+    ],
+    "game_id": "2026_08_KC_DEN",
+    "margin_abs_error": 3.4342997944907383,
+    "matchup": "KC @ DEN",
+    "official_home_prob": 0.4810578681006924,
+    "official_pick": "KC",
+    "projected_score": "DEN 22.9 \u2013 KC 22.4",
+    "total_abs_error": 6.713558409696759,
+    "what_missed": [
+      "The locked forecast missed the outright winner."
+    ],
+    "what_went_right": [
+      "The predicted margin finished 3.4 points from the actual margin.",
+      "The predicted total finished 6.7 points from the actual total."
+    ],
+    "winner_correct": false
+  },
   "2026_08_LV_NYJ": {
     "actual_score": "NYJ 33 \u2013 LV 38",
     "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
@@ -2489,6 +2511,50 @@
     "what_went_right": [
       "The locked forecast got the winner direction right.",
       "The predicted margin finished 2.6 points from the actual margin."
+    ],
+    "winner_correct": true
+  },
+  "2026_08_NE_MIA": {
+    "actual_score": "MIA 19 \u2013 NE 24",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "no_major_error_flag"
+    ],
+    "game_id": "2026_08_NE_MIA",
+    "margin_abs_error": 2.524763053596056,
+    "matchup": "NE @ MIA",
+    "official_home_prob": 0.2363765267003237,
+    "official_pick": "NE",
+    "projected_score": "MIA 18.2 \u2013 NE 25.7",
+    "total_abs_error": 0.907821006743248,
+    "what_missed": [],
+    "what_went_right": [
+      "The locked forecast got the winner direction right.",
+      "The predicted margin finished 2.5 points from the actual margin.",
+      "The predicted total finished 0.9 points from the actual total."
+    ],
+    "winner_correct": true
+  },
+  "2026_08_PHI_WAS": {
+    "actual_score": "WAS 27 \u2013 PHI 10",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "margin_miss",
+      "total_miss"
+    ],
+    "game_id": "2026_08_PHI_WAS",
+    "margin_abs_error": 15.059102935774456,
+    "matchup": "PHI @ WAS",
+    "official_home_prob": 0.7173974835119158,
+    "official_pick": "WAS",
+    "projected_score": "WAS 23.9 \u2013 PHI 22.0",
+    "total_abs_error": 8.898590403320611,
+    "what_missed": [
+      "The predicted margin finished 15.1 points from the actual margin.",
+      "The predicted total finished 8.9 points from the actual total."
+    ],
+    "what_went_right": [
+      "The locked forecast got the winner direction right."
     ],
     "winner_correct": true
   },
