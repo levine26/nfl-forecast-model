@@ -107,6 +107,13 @@ def audit_current_deadlines(
     }
     counts = {state: sum(v["state"] == state for v in games_out.values())
               for state in sorted({v["state"] for v in games_out.values()})}
+    # The short alert window must not erase a permanently missed official
+    # receipt from the read-only accountability record after kickoff.
+    historical_missing_receipts = sorted(
+        gid for gid, entry in games_out.items()
+        if entry["state"] in {"overdue_missing_official_lock",
+                              "missing_lock_outside_active_watch_window"}
+    )
     return {
         "schema_version": 1,
         "kind": "read_only_current_slate_official_lock_deadline_audit",
@@ -119,6 +126,10 @@ def audit_current_deadlines(
         "status": "active_lock_timing_violation" if issues else "no_active_lock_timing_violation",
         "issues": issues,
         "actionable_issues": actionable_issues,
+        "historical_missing_receipts": historical_missing_receipts,
+        "historical_missing_count": len(historical_missing_receipts),
+        "accountability_status": ("missing_official_receipts" if historical_missing_receipts
+                                  else "no_missing_official_receipts"),
         "counts": counts,
         "games": games_out,
         "historical_lock_records_modified": False,
@@ -146,7 +157,8 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     for gid, state in sorted(report["games"].items()):
-        if state["state"] in {"overdue_missing_official_lock", "historically_late_lock", "recorded_missed_lock_recovery"}:
+        if state["state"] in {"overdue_missing_official_lock", "missing_lock_outside_active_watch_window",
+                              "historically_late_lock", "recorded_missed_lock_recovery"}:
             print(f"::warning title=Official lock deadline::{gid}: {state['state']}")
     if report["actionable_issues"]:
         raise SystemExit(
@@ -157,13 +169,19 @@ def main() -> int:
     # Already-locked late receipts and uncorrectable post-kickoff misses stay in
     # the JSON artifact and workflow annotations. Do not make every subsequent
     # worker fail solely because immutable history cannot be backdated.
+    if report["historical_missing_receipts"]:
+        print(
+            f"ACCOUNTABILITY: {report['historical_missing_count']} official receipts "
+            f"remain missing permanently: {report['historical_missing_receipts']}. "
+            "Do not backdate or count these as locked."
+        )
     if report["issues"]:
         print(
-            f"ACCOUNTABILITY: {len(report['issues'])} past/late lock incidents "
+            f"ACCOUNTABILITY: {len(report['issues'])} active-window lock incidents "
             "recorded; no *actionable* missing prekickoff lock remains."
         )
     else:
-        print(f"Lock deadline audit: {report['games_audited']}/{report['games_expected']} canonical games checked; no active violations.")
+        print(f"Lock deadline audit: {report['games_audited']}/{report['games_expected']} canonical games checked; no active-window violations.")
     return 0
 
 
