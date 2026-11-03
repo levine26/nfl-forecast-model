@@ -14,7 +14,6 @@ game_id,away_team,home_team,kickoff_timestamp_utc,horizon,role,target_timestamp_
 2026_08_LV_NYJ,LV,NYJ,2026-11-01T18:00:00+00:00,T-2160m,predictor,2026-10-31T06:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_MIN_DET,MIN,DET,2026-11-01T18:00:00+00:00,T-2160m,predictor,2026-10-31T06:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_TEN_CIN,TEN,CIN,2026-11-01T18:00:00+00:00,T-2160m,predictor,2026-10-31T06:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,T-2160m,predictor,2026-10-31T09:05:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,T-2160m,predictor,2026-10-31T09:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,T-2160m,predictor,2026-10-31T09:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_PHI_WAS,PHI,WAS,2026-11-02T01:20:00+00:00,T-2160m,predictor,2026-10-31T13:20:00+00:00,True,missed_no_valid_capture,7.5,2,0
@@ -26,7 +25,6 @@ game_id,away_team,home_team,kickoff_timestamp_utc,horizon,role,target_timestamp_
 2026_08_LV_NYJ,LV,NYJ,2026-11-01T18:00:00+00:00,T-720m,predictor,2026-11-01T06:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_MIN_DET,MIN,DET,2026-11-01T18:00:00+00:00,T-720m,predictor,2026-11-01T06:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_TEN_CIN,TEN,CIN,2026-11-01T18:00:00+00:00,T-720m,predictor,2026-11-01T06:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,T-720m,predictor,2026-11-01T09:05:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,T-720m,predictor,2026-11-01T09:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,T-720m,predictor,2026-11-01T09:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_ARI_DAL,ARI,DAL,2026-11-01T18:00:00+00:00,T-360m,predictor,2026-11-01T12:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
@@ -39,7 +37,6 @@ game_id,away_team,home_team,kickoff_timestamp_utc,horizon,role,target_timestamp_
 2026_08_TEN_CIN,TEN,CIN,2026-11-01T18:00:00+00:00,T-360m,predictor,2026-11-01T12:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-2160m,predictor,2026-11-01T13:15:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_PHI_WAS,PHI,WAS,2026-11-02T01:20:00+00:00,T-720m,predictor,2026-11-01T13:20:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,T-360m,predictor,2026-11-01T15:05:00+00:00,True,captured,7.5,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,T-360m,predictor,2026-11-01T15:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,T-360m,predictor,2026-11-01T15:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_ARI_DAL,ARI,DAL,2026-11-01T18:00:00+00:00,T-120m,predictor,2026-11-01T16:00:00+00:00,True,missed_no_valid_capture,7.5,2,0
@@ -74,17 +71,13 @@ game_id,away_team,home_team,kickoff_timestamp_utc,horizon,role,target_timestamp_
 2026_08_LV_NYJ,LV,NYJ,2026-11-01T18:00:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-01T18:00:00+00:00,True,missed_no_valid_capture,,2,0
 2026_08_MIN_DET,MIN,DET,2026-11-01T18:00:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-01T18:00:00+00:00,True,missed_no_valid_capture,,2,0
 2026_08_TEN_CIN,TEN,CIN,2026-11-01T18:00:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-01T18:00:00+00:00,True,missed_no_valid_capture,,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,T-120m,predictor,2026-11-01T19:05:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_PHI_WAS,PHI,WAS,2026-11-02T01:20:00+00:00,T-360m,predictor,2026-11-01T19:20:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,T-120m,predictor,2026-11-01T19:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,T-120m,predictor,2026-11-01T19:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,T-60m,diagnostic_only,2026-11-01T20:05:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,T-60m,diagnostic_only,2026-11-01T20:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,T-60m,diagnostic_only,2026-11-01T20:25:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,T-30m,diagnostic_only,2026-11-01T20:35:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,T-30m,diagnostic_only,2026-11-01T20:55:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,T-30m,diagnostic_only,2026-11-01T20:55:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_LAC_LA,LAC,LA,2026-11-01T21:05:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-01T21:05:00+00:00,True,missed_no_valid_capture,,2,0
 2026_08_KC_DEN,KC,DEN,2026-11-01T21:25:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-01T21:25:00+00:00,True,missed_no_valid_capture,,2,0
 2026_08_NE_MIA,NE,MIA,2026-11-01T21:25:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-01T21:25:00+00:00,True,missed_no_valid_capture,,2,0
 2026_08_PHI_WAS,PHI,WAS,2026-11-02T01:20:00+00:00,T-120m,predictor,2026-11-01T23:20:00+00:00,True,missed_no_valid_capture,7.5,2,0
@@ -93,7 +86,7 @@ game_id,away_team,home_team,kickoff_timestamp_utc,horizon,role,target_timestamp_
 2026_08_PHI_WAS,PHI,WAS,2026-11-02T01:20:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-02T01:20:00+00:00,True,missed_no_valid_capture,,2,0
 2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-720m,predictor,2026-11-02T13:15:00+00:00,True,missed_no_valid_capture,7.5,2,0
 2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-360m,predictor,2026-11-02T19:15:00+00:00,True,missed_no_valid_capture,7.5,2,0
-2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-120m,predictor,2026-11-02T23:15:00+00:00,True,future,7.5,2,0
-2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-60m,diagnostic_only,2026-11-03T00:15:00+00:00,True,future,7.5,2,0
-2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-30m,diagnostic_only,2026-11-03T00:45:00+00:00,True,future,7.5,2,0
-2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-03T01:15:00+00:00,True,future,,2,0
+2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-120m,predictor,2026-11-02T23:15:00+00:00,True,missed_no_valid_capture,7.5,2,0
+2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-60m,diagnostic_only,2026-11-03T00:15:00+00:00,True,missed_no_valid_capture,7.5,2,0
+2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,T-30m,diagnostic_only,2026-11-03T00:45:00+00:00,True,missed_no_valid_capture,7.5,2,0
+2026_08_CHI_SEA,CHI,SEA,2026-11-03T01:15:00+00:00,LATEST_PREKICK,diagnostic_only,2026-11-03T01:15:00+00:00,True,missed_no_valid_capture,,2,0
