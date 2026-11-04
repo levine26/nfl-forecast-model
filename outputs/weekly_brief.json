@@ -1,69 +1,61 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_09_ARI_SEA",
+      "largest_driver": "Market movement",
+      "pick": "SEA",
+      "pick_delta_pp": -7.280654718285939
+    },
+    {
+      "game_id": "2026_09_NYG_PHI",
+      "largest_driver": "Market movement",
+      "pick": "NYG",
+      "pick_delta_pp": -1.2220688034310812
+    },
+    {
       "game_id": "2026_05_BUF_LA",
       "largest_driver": "Market movement",
       "pick": "LA",
       "pick_delta_pp": 0.9960877503218168
-    },
-    {
-      "game_id": "2026_09_JAX_BAL",
-      "largest_driver": "Market movement",
-      "pick": "JAX",
-      "pick_delta_pp": -0.79967382057336
-    },
-    {
-      "game_id": "2026_06_WAS_SF",
-      "largest_driver": "Market movement",
-      "pick": "SF",
-      "pick_delta_pp": -0.7037037747535946
     }
   ],
-  "generated_utc": "2026-11-03T20:37:11.905028+00:00",
+  "generated_utc": "2026-11-04T20:50:40.250176+00:00",
   "market_disagreements": [
+    {
+      "confidence": "Lean",
+      "game_id": "2026_09_CLE_NO",
+      "matchup": "CLE @ NO",
+      "pick": "NO",
+      "pick_prob": 0.6093480018028267,
+      "projected_score": "NO 22.0 \u2013 CLE 23.0",
+      "pure_market_gap_pp": 17.82657911063185
+    },
     {
       "confidence": "High",
       "game_id": "2026_09_ARI_SEA",
       "matchup": "ARI @ SEA",
       "pick": "SEA",
-      "pick_prob": 0.8385859743356874,
+      "pick_prob": 0.7984952916675551,
       "projected_score": "SEA 25.8 \u2013 ARI 19.7",
-      "pure_market_gap_pp": 17.12149132227456
+      "pure_market_gap_pp": 13.56234034231073
     },
     {
       "confidence": "High",
-      "game_id": "2026_09_DAL_IND",
-      "matchup": "DAL @ IND",
-      "pick": "DAL",
-      "pick_prob": 0.73899757279279,
-      "projected_score": "IND 20.4 \u2013 DAL 21.7",
-      "pure_market_gap_pp": 14.344622913466164
-    },
-    {
-      "confidence": "High",
-      "game_id": "2026_09_JAX_BAL",
-      "matchup": "JAX @ BAL",
-      "pick": "JAX",
-      "pick_prob": 0.8319211085182442,
-      "projected_score": "BAL 20.7 \u2013 JAX 27.1",
-      "pure_market_gap_pp": 12.139940201732774
+      "game_id": "2026_09_NYJ_KC",
+      "matchup": "NYJ @ KC",
+      "pick": "KC",
+      "pick_prob": 0.8336732888930232,
+      "projected_score": "KC 25.6 \u2013 NYJ 18.4",
+      "pure_market_gap_pp": 13.414458455749212
     }
   ],
   "most_uncertain": [
-    {
-      "confidence": "Coin Flip",
-      "game_id": "2026_09_CLE_NO",
-      "matchup": "CLE @ NO",
-      "pick": "NO",
-      "pick_prob": 0.5242963187355469,
-      "projected_score": "NO 22.0 \u2013 CLE 23.0"
-    },
     {
       "confidence": "Lean",
       "game_id": "2026_09_DEN_CAR",
       "matchup": "DEN @ CAR",
       "pick": "DEN",
-      "pick_prob": 0.5695611253692214,
+      "pick_prob": 0.5797490638118618,
       "projected_score": "CAR 19.6 \u2013 DEN 24.2"
     },
     {
@@ -71,33 +63,41 @@
       "game_id": "2026_09_GB_NE",
       "matchup": "GB @ NE",
       "pick": "NE",
-      "pick_prob": 0.5760504214681813,
+      "pick_prob": 0.5810527566993549,
       "projected_score": "NE 23.6 \u2013 GB 19.4"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_09_CIN_ATL",
+      "matchup": "CIN @ ATL",
+      "pick": "CIN",
+      "pick_prob": 0.5853539790891158,
+      "projected_score": "ATL 19.6 \u2013 CIN 23.7"
     }
   ],
   "strongest": [
     {
       "confidence": "High",
-      "game_id": "2026_09_ARI_SEA",
-      "matchup": "ARI @ SEA",
-      "pick": "SEA",
-      "pick_prob": 0.8385859743356874,
-      "projected_score": "SEA 25.8 \u2013 ARI 19.7"
-    },
-    {
-      "confidence": "High",
       "game_id": "2026_09_JAX_BAL",
       "matchup": "JAX @ BAL",
       "pick": "JAX",
-      "pick_prob": 0.8319211085182442,
+      "pick_prob": 0.836010069516833,
       "projected_score": "BAL 20.7 \u2013 JAX 27.1"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_09_NYJ_KC",
+      "matchup": "NYJ @ KC",
+      "pick": "KC",
+      "pick_prob": 0.8336732888930232,
+      "projected_score": "KC 25.6 \u2013 NYJ 18.4"
     },
     {
       "confidence": "High",
       "game_id": "2026_09_LV_SF",
       "matchup": "LV @ SF",
       "pick": "SF",
-      "pick_prob": 0.8149840180944946,
+      "pick_prob": 0.8060293821218784,
       "projected_score": "SF 29.2 \u2013 LV 16.4"
     }
   ],
