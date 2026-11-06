@@ -60,6 +60,15 @@ jobs:
                 python scripts/run_challenger_fst_evaluation.py
             fi
 
+            # Repeated numerical refits can fluctuate by ~1e-16 in derived
+            # calibration reporting despite identical outcomes/receipts.
+            # Never turn this research-only precision noise into a main commit
+            # that triggers more publication/deployment workflows.
+            if [ -f challenger_outputs/fst/prospective_evaluation.json ]; then
+              python research/avoid_noop_challenger_calibration_churn.py \
+                --path challenger_outputs/fst/prospective_evaluation.json --previous-ref HEAD
+            fi
+
             git add challenger_outputs/prediction_history_shadow.csv
             git add challenger_outputs/fst/prospective_evaluation.json challenger_outputs/fst/prospective_weekly.csv
             if git diff --cached --quiet; then
