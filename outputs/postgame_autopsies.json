@@ -2602,5 +2602,27 @@
       "The predicted margin finished 5.2 points from the actual margin."
     ],
     "winner_correct": true
+  },
+  "2026_09_JAX_BAL": {
+    "actual_score": "BAL 10 \u2013 JAX 33",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "margin_miss"
+    ],
+    "game_id": "2026_09_JAX_BAL",
+    "margin_abs_error": 16.63394173865813,
+    "matchup": "JAX @ BAL",
+    "official_home_prob": 0.1818948140702064,
+    "official_pick": "JAX",
+    "projected_score": "BAL 20.7 \u2013 JAX 27.1",
+    "total_abs_error": 4.848822739204991,
+    "what_missed": [
+      "The predicted margin finished 16.6 points from the actual margin."
+    ],
+    "what_went_right": [
+      "The locked forecast got the winner direction right.",
+      "The predicted total finished 4.8 points from the actual total."
+    ],
+    "winner_correct": true
   }
 }
