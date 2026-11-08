@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 83,
+    "late": 87,
     "on_time": 40,
     "premature": 0
   },
@@ -1238,9 +1238,49 @@
       "minutes_late_vs_target": 0.3119,
       "scheduled_lock_utc": "2026-11-08T17:00:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-08T20:36:30.341476+00:00",
+      "classification": "late",
+      "game_id": "2026_09_HOU_LAC",
+      "minutes_before_kickoff": 28.4943,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 31.5057,
+      "scheduled_lock_utc": "2026-11-08T20:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-08T20:36:30.341476+00:00",
+      "classification": "late",
+      "game_id": "2026_09_LV_SF",
+      "minutes_before_kickoff": 28.4943,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 31.5057,
+      "scheduled_lock_utc": "2026-11-08T20:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-08T20:36:30.341476+00:00",
+      "classification": "late",
+      "game_id": "2026_09_ARI_SEA",
+      "minutes_before_kickoff": 48.4943,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 11.5057,
+      "scheduled_lock_utc": "2026-11-08T20:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-08T20:36:30.341476+00:00",
+      "classification": "late",
+      "game_id": "2026_09_GB_NE",
+      "minutes_before_kickoff": 48.4943,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 11.5057,
+      "scheduled_lock_utc": "2026-11-08T20:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 123,
+  "locked_count": 127,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
