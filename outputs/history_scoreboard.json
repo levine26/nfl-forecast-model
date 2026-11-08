@@ -1,19 +1,19 @@
 {
-  "brier": 0.23286679051544798,
-  "brier_vs_market": -0.00038175728924427776,
-  "generated_utc": "2026-11-08T17:16:25.330220+00:00",
-  "graded": 115,
+  "brier": 0.23207102444970015,
+  "brier_vs_market": -0.0003219006942233871,
+  "generated_utc": "2026-11-08T18:53:39.074972+00:00",
+  "graded": 116,
   "locked": 123,
-  "margin_mae": 9.998126787248696,
-  "market_brier": 0.2324850332262037,
+  "margin_mae": 10.016046032060556,
+  "market_brier": 0.23174912375547677,
   "notes": [
     "Only genuine immutable LOCKED official receipts are included; 2026 Weeks 1\u20135 target T\u2212120 and Week 6 onward T\u221260.",
     "The Brier difference uses paired games with both LevLine and market probabilities; positive market-minus-model means LevLine has the lower Brier score.",
     "Stored market probabilities are not necessarily timestamp-qualified against the original lock; inspect market provenance separately.",
     "No ROI is shown unless a separately defined, timestamped betting rule is being tracked."
   ],
-  "record": "72-43",
+  "record": "73-43",
   "status": "live_forward_test",
-  "total_mae": 11.649073531290853,
-  "winner_accuracy": 0.6260869565217392
+  "total_mae": 11.617204085447387,
+  "winner_accuracy": 0.6293103448275862
 }
