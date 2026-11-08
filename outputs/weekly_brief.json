@@ -1,16 +1,16 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_09_NYG_PHI",
+      "game_id": "2026_09_DAL_IND",
       "largest_driver": "Market movement",
-      "pick": "NYG",
-      "pick_delta_pp": 1.2247281382865127
+      "pick": "DAL",
+      "pick_delta_pp": -1.462070395209203
     },
     {
-      "game_id": "2026_09_LV_SF",
+      "game_id": "2026_09_LA_WAS",
       "largest_driver": "Market movement",
-      "pick": "SF",
-      "pick_delta_pp": -1.0309331931202093
+      "pick": "LA",
+      "pick_delta_pp": -1.3417526477185138
     },
     {
       "game_id": "2026_05_BUF_LA",
@@ -19,16 +19,16 @@
       "pick_delta_pp": 0.9960877503218168
     }
   ],
-  "generated_utc": "2026-11-08T12:20:51.453838+00:00",
+  "generated_utc": "2026-11-08T17:16:25.278317+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
       "game_id": "2026_09_CLE_NO",
       "matchup": "CLE @ NO",
       "pick": "NO",
-      "pick_prob": 0.6215625516590783,
+      "pick_prob": 0.6533087885960323,
       "projected_score": "NO 21.7 \u2013 CLE 22.7",
-      "pure_market_gap_pp": 18.168856681857104
+      "pure_market_gap_pp": 20.887193965799078
     },
     {
       "confidence": "High",
@@ -44,20 +44,12 @@
       "game_id": "2026_09_NYJ_KC",
       "matchup": "NYJ @ KC",
       "pick": "KC",
-      "pick_prob": 0.8174937535800822,
+      "pick_prob": 0.8080876761054964,
       "projected_score": "KC 25.5 \u2013 NYJ 18.1",
-      "pure_market_gap_pp": 11.480753340624606
+      "pure_market_gap_pp": 10.66504337083608
     }
   ],
   "most_uncertain": [
-    {
-      "confidence": "Lean",
-      "game_id": "2026_09_DEN_CAR",
-      "matchup": "DEN @ CAR",
-      "pick": "DEN",
-      "pick_prob": 0.5695611253695975,
-      "projected_score": "CAR 19.6 \u2013 DEN 24.3"
-    },
     {
       "confidence": "Lean",
       "game_id": "2026_09_GB_NE",
@@ -67,11 +59,19 @@
       "projected_score": "NE 23.7 \u2013 GB 19.7"
     },
     {
-      "confidence": "Solid",
+      "confidence": "Lean",
+      "game_id": "2026_09_DEN_CAR",
+      "matchup": "DEN @ CAR",
+      "pick": "DEN",
+      "pick_prob": 0.5927254949844465,
+      "projected_score": "CAR 19.6 \u2013 DEN 24.3"
+    },
+    {
+      "confidence": "Lean",
       "game_id": "2026_09_NYG_PHI",
       "matchup": "NYG @ PHI",
       "pick": "NYG",
-      "pick_prob": 0.6088287958153552,
+      "pick_prob": 0.5965815144324902,
       "projected_score": "PHI 20.7 \u2013 NYG 23.3"
     }
   ],
@@ -81,7 +81,7 @@
       "game_id": "2026_09_NYJ_KC",
       "matchup": "NYJ @ KC",
       "pick": "KC",
-      "pick_prob": 0.8174937535800822,
+      "pick_prob": 0.8080876761054964,
       "projected_score": "KC 25.5 \u2013 NYJ 18.1"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_09_LV_SF",
       "matchup": "LV @ SF",
       "pick": "SF",
-      "pick_prob": 0.7906208320849933,
+      "pick_prob": 0.7792676828364261,
       "projected_score": "SF 29.0 \u2013 LV 16.1"
     }
   ],
