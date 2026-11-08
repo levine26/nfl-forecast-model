@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 81,
+    "late": 82,
     "on_time": 33,
     "premature": 0
   },
@@ -1148,9 +1148,19 @@
       "minutes_late_vs_target": 29.5204,
       "scheduled_lock_utc": "2026-11-03T00:15:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-06T00:31:31.564192+00:00",
+      "classification": "late",
+      "game_id": "2026_09_JAX_BAL",
+      "minutes_before_kickoff": 43.4739,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 16.5261,
+      "scheduled_lock_utc": "2026-11-06T00:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 114,
+  "locked_count": 115,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
