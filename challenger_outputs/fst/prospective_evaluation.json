@@ -2,69 +2,69 @@
   "candidate_id": "F-ST-01-FROZEN-2026",
   "status": "accumulating_prospective_evidence",
   "primary_metric": "brier",
-  "games": 51,
+  "games": 52,
   "weeks": 8,
   "excluded_prefreeze_rows": 0,
   "metrics": {
     "fst": {
-      "games": 51,
-      "winner_pct": 0.6470588235294118,
-      "brier": 0.23363486165736083,
-      "log_loss": 0.6655077105638665
+      "games": 52,
+      "winner_pct": 0.6346153846153846,
+      "brier": 0.23563462020371773,
+      "log_loss": 0.6694404522446467
     },
     "production": {
-      "games": 51,
-      "winner_pct": 0.6470588235294118,
-      "brier": 0.2333541453334198,
-      "log_loss": 0.6649103911192364
+      "games": 52,
+      "winner_pct": 0.6346153846153846,
+      "brier": 0.23535941802667631,
+      "log_loss": 0.6688548574728371
     },
     "market": {
-      "games": 51,
-      "winner_pct": 0.6274509803921569,
-      "brier": 0.2338805875378761,
-      "log_loss": 0.6648129506245823
+      "games": 52,
+      "winner_pct": 0.6153846153846154,
+      "brier": 0.23639293162294142,
+      "log_loss": 0.6698305390015806
     },
     "pure": {
-      "games": 51,
-      "winner_pct": 0.6078431372549019,
-      "brier": 0.23285341207648633,
-      "log_loss": 0.6565664389657875
+      "games": 52,
+      "winner_pct": 0.5961538461538461,
+      "brier": 0.23610232205651235,
+      "log_loss": 0.6632628302064222
     }
   },
   "calibration": {
     "fst": {
-      "games": 51,
-      "calibration_intercept": -0.2795214996537186,
-      "calibration_slope": 0.79769625065094
+      "games": 52,
+      "calibration_intercept": -0.32049312085065873,
+      "calibration_slope": 0.7968502118081282
     },
     "production": {
-      "games": 51,
-      "calibration_intercept": -0.2800297851500272,
-      "calibration_slope": 0.8021927959888395
+      "games": 52,
+      "calibration_intercept": -0.321040034031063,
+      "calibration_slope": 0.8012663314850929
     },
     "market": {
-      "games": 51,
-      "calibration_intercept": -0.33337163162961486,
-      "calibration_slope": 0.8739066742427603
+      "games": 52,
+      "calibration_intercept": -0.3737564814473551,
+      "calibration_slope": 0.8665700522175883
     },
     "pure": {
-      "games": 51,
-      "calibration_intercept": -0.20899994642645875,
-      "calibration_slope": 1.0256632033372044
+      "games": 52,
+      "calibration_intercept": -0.24772061664883926,
+      "calibration_slope": 0.9684027025058282
     }
   },
   "paired": {
-    "fst_minus_production_brier": 0.0002807163239410271,
-    "fst_minus_market_brier": -0.000245725880515274,
+    "fst_minus_production_brier": 0.0002752021770414115,
+    "fst_minus_market_brier": -0.000758311419223695,
     "production_week_block_bootstrap": {
       "metric": "brier",
       "candidate": "challenger_final_home_prob",
       "reference": "production_final_home_prob",
       "block": "season+week",
-      "observed_delta": 0.0002807163239410271,
-      "ci_lower": -6.65308086400529e-14,
-      "ci_upper": 0.0006711532548588602,
-      "probability_better": 0.1712,
+      "observed_delta": 0.0002752021770414115,
+      "ci_lower": -4.514485667808654e-07,
+      "ci_upper": 0.0006707136060382118,
+      "probability_better": 0.2937,
       "samples": 10000
     },
     "market_week_block_bootstrap": {
@@ -72,10 +72,10 @@
       "candidate": "challenger_final_home_prob",
       "reference": "market_home_prob_t120",
       "block": "season+week",
-      "observed_delta": -0.000245725880515274,
-      "ci_lower": -0.0037161257533976483,
-      "ci_upper": 0.006982093773152842,
-      "probability_better": 0.5486,
+      "observed_delta": -0.000758311419223695,
+      "ci_lower": -0.0044590523188881015,
+      "ci_upper": 0.0061303137308961085,
+      "probability_better": 0.6318,
       "samples": 10000
     }
   },
@@ -95,8 +95,8 @@
       "brier": 0.2576986943191024,
       "log_loss": 0.7312155759047645
     },
-    "mean_abs_probability_disagreement_vs_market": 0.016270395920222325,
-    "mean_abs_probability_disagreement_vs_production": 0.00022548159328384702
+    "mean_abs_probability_disagreement_vs_market": 0.016394123195656952,
+    "mean_abs_probability_disagreement_vs_production": 0.00022124501725599816
   },
   "promotion_gate": {
     "minimum_games": 200,
@@ -105,7 +105,7 @@
     "A_vs_production_pass": false,
     "B_market_noninferiority_margin": 0.0025,
     "B_vs_market_pass": false,
-    "C_median_weekly_delta": 7.512740429760356e-14,
+    "C_median_weekly_delta": 6.467049118441537e-15,
     "C_leave_one_week_out_all_negative": false,
     "C_week_coherence_pass": false
   },
