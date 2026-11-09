@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 87,
+    "late": 88,
     "on_time": 40,
     "premature": 0
   },
@@ -1278,9 +1278,19 @@
       "minutes_late_vs_target": 11.5057,
       "scheduled_lock_utc": "2026-11-08T20:25:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-09T00:44:07.649273+00:00",
+      "classification": "late",
+      "game_id": "2026_09_TB_CHI",
+      "minutes_before_kickoff": 35.8725,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 24.1275,
+      "scheduled_lock_utc": "2026-11-09T00:20:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 127,
+  "locked_count": 128,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
