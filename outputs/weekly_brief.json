@@ -1,78 +1,78 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_10_SEA_LV",
+      "largest_driver": "Market movement",
+      "pick": "SEA",
+      "pick_delta_pp": 10.783452095966917
+    },
+    {
+      "game_id": "2026_10_MIN_GB",
+      "largest_driver": "Market movement",
+      "pick": "GB",
+      "pick_delta_pp": -7.98249462921018
+    },
+    {
       "game_id": "2026_09_BUF_MIN",
       "largest_driver": "Market movement",
       "pick": "BUF",
       "pick_delta_pp": -1.658164208783408
-    },
-    {
-      "game_id": "2026_05_BUF_LA",
-      "largest_driver": "Market movement",
-      "pick": "LA",
-      "pick_delta_pp": 0.9960877503218168
-    },
-    {
-      "game_id": "2026_06_WAS_SF",
-      "largest_driver": "Market movement",
-      "pick": "SF",
-      "pick_delta_pp": -0.7037037747535946
     }
   ],
-  "generated_utc": "2026-11-10T09:46:42.243768+00:00",
+  "generated_utc": "2026-11-10T20:51:01.690536+00:00",
   "market_disagreements": [
     {
       "confidence": "High",
       "game_id": "2026_10_BUF_NYJ",
       "matchup": "BUF @ NYJ",
       "pick": "BUF",
-      "pick_prob": 0.8337446993548766,
-      "projected_score": "NYJ 17.7 \u2013 BUF 26.6",
-      "pure_market_gap_pp": 10.07072603439616
+      "pick_prob": 0.8204356065109499,
+      "projected_score": "NYJ 17.7 \u2013 BUF 26.4",
+      "pure_market_gap_pp": 9.417829816210462
     },
     {
-      "confidence": "High",
-      "game_id": "2026_10_JAX_TEN",
-      "matchup": "JAX @ TEN",
-      "pick": "JAX",
-      "pick_prob": 0.8426884405440168,
-      "projected_score": "TEN 16.5 \u2013 JAX 26.9",
-      "pure_market_gap_pp": 7.783159738133488
+      "confidence": "Lean",
+      "game_id": "2026_10_MIN_GB",
+      "matchup": "MIN @ GB",
+      "pick": "GB",
+      "pick_prob": 0.572891520348052,
+      "projected_score": "GB 26.4 \u2013 MIN 21.2",
+      "pure_market_gap_pp": 8.664658647592816
     },
     {
       "confidence": "Coin Flip",
       "game_id": "2026_10_WAS_NYG",
       "matchup": "WAS @ NYG",
       "pick": "NYG",
-      "pick_prob": 0.5168731648766076,
+      "pick_prob": 0.5064018972310115,
       "projected_score": "NYG 24.7 \u2013 WAS 20.5",
-      "pure_market_gap_pp": 7.49553262479894
+      "pure_market_gap_pp": 8.503186442608989
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_10_CAR_NO",
-      "matchup": "CAR @ NO",
-      "pick": "NO",
-      "pick_prob": 0.5115877838131179,
-      "projected_score": "NO 22.5 \u2013 CAR 22.9"
-    },
-    {
-      "confidence": "Coin Flip",
       "game_id": "2026_10_WAS_NYG",
       "matchup": "WAS @ NYG",
       "pick": "NYG",
-      "pick_prob": 0.5168731648766076,
+      "pick_prob": 0.5064018972310115,
       "projected_score": "NYG 24.7 \u2013 WAS 20.5"
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_10_CAR_NO",
+      "matchup": "CAR @ NO",
+      "pick": "NO",
+      "pick_prob": 0.5167859453198351,
+      "projected_score": "NO 22.2 \u2013 CAR 22.7"
     },
     {
       "confidence": "Coin Flip",
       "game_id": "2026_10_MIA_IND",
       "matchup": "MIA @ IND",
       "pick": "IND",
-      "pick_prob": 0.5326184755752341,
-      "projected_score": "IND 22.2 \u2013 MIA 20.7"
+      "pick_prob": 0.5471058399198465,
+      "projected_score": "IND 22.2 \u2013 MIA 21.1"
     }
   ],
   "strongest": [
@@ -81,24 +81,24 @@
       "game_id": "2026_10_JAX_TEN",
       "matchup": "JAX @ TEN",
       "pick": "JAX",
-      "pick_prob": 0.8426884405440168,
-      "projected_score": "TEN 16.5 \u2013 JAX 26.9"
+      "pick_prob": 0.8426884405442451,
+      "projected_score": "TEN 16.8 \u2013 JAX 27.1"
     },
     {
       "confidence": "High",
       "game_id": "2026_10_BUF_NYJ",
       "matchup": "BUF @ NYJ",
       "pick": "BUF",
-      "pick_prob": 0.8337446993548766,
-      "projected_score": "NYJ 17.7 \u2013 BUF 26.6"
+      "pick_prob": 0.8204356065109499,
+      "projected_score": "NYJ 17.7 \u2013 BUF 26.4"
     },
     {
       "confidence": "High",
       "game_id": "2026_10_LA_ARI",
       "matchup": "LA @ ARI",
       "pick": "LA",
-      "pick_prob": 0.8090117997803132,
-      "projected_score": "ARI 18.7 \u2013 LA 26.0"
+      "pick_prob": 0.8090117997798081,
+      "projected_score": "ARI 18.5 \u2013 LA 26.1"
     }
   ],
   "week": 10
