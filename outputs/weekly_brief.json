@@ -7,46 +7,46 @@
       "pick_delta_pp": -1.658164208783408
     },
     {
+      "game_id": "2026_10_WAS_NYG",
+      "largest_driver": "Market movement",
+      "pick": "WAS",
+      "pick_delta_pp": 1.2338226325119772
+    },
+    {
       "game_id": "2026_05_BUF_LA",
       "largest_driver": "Market movement",
       "pick": "LA",
       "pick_delta_pp": 0.9960877503218168
-    },
-    {
-      "game_id": "2026_06_WAS_SF",
-      "largest_driver": "Market movement",
-      "pick": "SF",
-      "pick_delta_pp": -0.7037037747535946
     }
   ],
-  "generated_utc": "2026-11-11T21:22:02.068904+00:00",
+  "generated_utc": "2026-11-12T21:32:41.039225+00:00",
   "market_disagreements": [
     {
-      "confidence": "Lean",
+      "confidence": "Coin Flip",
       "game_id": "2026_10_MIN_GB",
       "matchup": "MIN @ GB",
       "pick": "GB",
-      "pick_prob": 0.5602175446729063,
+      "pick_prob": 0.54757926616168,
       "projected_score": "GB 26.4 \u2013 MIN 21.2",
-      "pure_market_gap_pp": 9.703380325874289
+      "pure_market_gap_pp": 10.741091588392004
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_10_WAS_NYG",
+      "matchup": "WAS @ NYG",
+      "pick": "WAS",
+      "pick_prob": 0.5059363290941082,
+      "projected_score": "NYG 24.7 \u2013 WAS 20.5",
+      "pure_market_gap_pp": 9.53078707153361
     },
     {
       "confidence": "High",
-      "game_id": "2026_10_BUF_NYJ",
-      "matchup": "BUF @ NYJ",
-      "pick": "BUF",
-      "pick_prob": 0.8053167146650576,
-      "projected_score": "NYJ 17.7 \u2013 BUF 26.4",
-      "pure_market_gap_pp": 8.030872153033213
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_10_HOU_CLE",
-      "matchup": "HOU @ CLE",
-      "pick": "HOU",
-      "pick_prob": 0.6892726997050838,
-      "projected_score": "CLE 20.1 \u2013 HOU 24.2",
-      "pure_market_gap_pp": 7.401050151866867
+      "game_id": "2026_10_LA_ARI",
+      "matchup": "LA @ ARI",
+      "pick": "LA",
+      "pick_prob": 0.8281354101416459,
+      "projected_score": "ARI 18.5 \u2013 LA 26.1",
+      "pure_market_gap_pp": 8.052408246382031
     }
   ],
   "most_uncertain": [
@@ -54,8 +54,8 @@
       "confidence": "Coin Flip",
       "game_id": "2026_10_WAS_NYG",
       "matchup": "WAS @ NYG",
-      "pick": "NYG",
-      "pick_prob": 0.5314192090005642,
+      "pick": "WAS",
+      "pick_prob": 0.5059363290941082,
       "projected_score": "NYG 24.7 \u2013 WAS 20.5"
     },
     {
@@ -63,16 +63,16 @@
       "game_id": "2026_10_CAR_NO",
       "matchup": "CAR @ NO",
       "pick": "NO",
-      "pick_prob": 0.5471128445785092,
+      "pick_prob": 0.5367095216656489,
       "projected_score": "NO 22.2 \u2013 CAR 22.7"
     },
     {
-      "confidence": "Lean",
-      "game_id": "2026_10_NE_DET",
-      "matchup": "NE @ DET",
-      "pick": "DET",
-      "pick_prob": 0.5520020290088306,
-      "projected_score": "DET 26.0 \u2013 NE 22.9"
+      "confidence": "Coin Flip",
+      "game_id": "2026_10_MIN_GB",
+      "matchup": "MIN @ GB",
+      "pick": "GB",
+      "pick_prob": 0.54757926616168,
+      "projected_score": "GB 26.4 \u2013 MIN 21.2"
     }
   ],
   "strongest": [
@@ -81,24 +81,24 @@
       "game_id": "2026_10_JAX_TEN",
       "matchup": "JAX @ TEN",
       "pick": "JAX",
-      "pick_prob": 0.8272040929365528,
+      "pick_prob": 0.8426884405440168,
       "projected_score": "TEN 16.8 \u2013 JAX 27.1"
-    },
-    {
-      "confidence": "High",
-      "game_id": "2026_10_BUF_NYJ",
-      "matchup": "BUF @ NYJ",
-      "pick": "BUF",
-      "pick_prob": 0.8053167146650576,
-      "projected_score": "NYJ 17.7 \u2013 BUF 26.4"
     },
     {
       "confidence": "High",
       "game_id": "2026_10_LA_ARI",
       "matchup": "LA @ ARI",
       "pick": "LA",
-      "pick_prob": 0.8036807821469464,
+      "pick_prob": 0.8281354101416459,
       "projected_score": "ARI 18.5 \u2013 LA 26.1"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_10_BUF_NYJ",
+      "matchup": "BUF @ NYJ",
+      "pick": "BUF",
+      "pick_prob": 0.8053167146655156,
+      "projected_score": "NYJ 17.7 \u2013 BUF 26.4"
     }
   ],
   "week": 10
