@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 88,
-    "on_time": 40,
+    "on_time": 41,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1288,9 +1288,19 @@
       "minutes_late_vs_target": 24.1275,
       "scheduled_lock_utc": "2026-11-09T00:20:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-13T00:15:26.226457+00:00",
+      "classification": "on_time",
+      "game_id": "2026_10_WAS_NYG",
+      "minutes_before_kickoff": 59.5629,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.4371,
+      "scheduled_lock_utc": "2026-11-13T00:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 128,
+  "locked_count": 129,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
