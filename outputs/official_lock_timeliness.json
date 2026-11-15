@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 89,
-    "on_time": 48,
+    "on_time": 50,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1378,9 +1378,29 @@
       "minutes_late_vs_target": 3.6259,
       "scheduled_lock_utc": "2026-11-15T17:00:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-15T20:05:48.288863+00:00",
+      "classification": "on_time",
+      "game_id": "2026_10_LA_ARI",
+      "minutes_before_kickoff": 59.1952,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.8048,
+      "scheduled_lock_utc": "2026-11-15T20:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-15T20:05:48.288863+00:00",
+      "classification": "on_time",
+      "game_id": "2026_10_SEA_LV",
+      "minutes_before_kickoff": 59.1952,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.8048,
+      "scheduled_lock_utc": "2026-11-15T20:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 137,
+  "locked_count": 139,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
