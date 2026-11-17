@@ -1,29 +1,25 @@
 {
-  "status": "degraded",
-  "expected_week_games": 14,
-  "missing_week_game_ids": [
-    "2026_10_PIT_CIN",
-    "2026_10_SF_DAL"
-  ],
+  "status": "healthy",
+  "expected_week_games": 13,
+  "missing_week_game_ids": [],
   "slate_completeness_verified": true,
-  "generated_utc": "2026-11-17T03:39:54.900593+00:00",
-  "games": 12,
+  "generated_utc": "2026-11-17T13:13:36.829429+00:00",
+  "games": 13,
   "locked_official_predictions": 139,
   "power_rating_teams": 32,
-  "next_kickoff_utc": null,
+  "next_kickoff_utc": "2026-11-20T01:15:00+00:00",
   "model_version": "0.9.0-fst",
   "final_probability_strategy": "F-ST-01-FROZEN-2026",
   "fst_artifact_id": "F-ST-01-FROZEN-2026",
   "fst_artifact_training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
-  "market_available_games": 12,
+  "market_available_games": 13,
   "market_missing_or_invalid_games": 0,
-  "market_provenance_missing_games": 11,
+  "market_provenance_missing_games": 0,
   "fst_fallback_count": 0,
-  "market_snapshot_timestamp_utc": "2026-11-17T03:39:54.899350+00:00",
+  "market_snapshot_timestamp_utc": "2026-11-17T13:13:36.826326+00:00",
   "market_snapshot_source": "nflverse_games.csv_moneyline",
   "market_freshness_status_counts": {
-    "unknown": 11,
-    "refreshed_this_run": 1
+    "refreshed_this_run": 13
   },
   "data_state": "2026 schedule/results/Elo + PBP/EPA live"
 }
