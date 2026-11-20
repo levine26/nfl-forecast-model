@@ -1,0 +1,29 @@
+{
+  "artifact": "LEVLINE_BETTING_LAB_B08C_HISTORICAL_GAME_MARKETS",
+  "as_of": "2026-10-11",
+  "historical_scope": "2022-2025 ML FST; 2022-2024 A0/B0/C0 margin+totals; 2022-2025 ATS fairline separate",
+  "moneyline_spread_total_independent": true,
+  "production_changed": false,
+  "qualified_actual_bookmaker_roi": false,
+  "research_only": true,
+  "sha256_files": {
+    "betlab/cli.py": "ea1619e74567e5f2e35d33e4c4ec6b45607f091ac6b795066af35bf41e043c87",
+    "betlab/frozen_oof_audit.py": "71139dc827e48c5d1a7bbdeda42119d5f89c2722e42b485d1464bd49129061bb",
+    "betlab/fst_archive_audit.py": "208813ff2e38db51093cd7c5d60a95a00bf7c5e34ca3cc0626787d399efe664b",
+    "docs/B08C_ARCHIVAL_REPLAY_RECEIPT.json": "20a629110161dca8cb9858f2ced4b2d416db9d1d5f22e5fd99498ae12ab421ea",
+    "docs/HANDOFF.md": "480e01c5df017b00665ed03e69c002250ad43b132511723233f1004f81621325",
+    "docs/ROADMAP.md": "ba5d314fcfd9a19d07f5a1d9d10797bcf049aaf3676cf8e60c83dd9323655070",
+    "reports/b08_sprint/B08C_HISTORICAL_FINDINGS.md": "425bc05d5be67ada1949b714a3af1ec359aafce71f014d7203a578fd29109a31",
+    "reports/b08_sprint/B08C_VERIFIED_MARKET_AUDIT_2022_2025.json": "6c2c286d6dbd1672780c50c44f882d706792080237b4093a401f1b94ed2925a4",
+    "tests/test_frozen_oof_audit.py": "f7391662db268b8e5d647a711b58ddfff7694e1c7875e5f460bb3efd37e48d08",
+    "tests/test_fst_archive_audit.py": "039cf1f9d75d786107c0f5f7d0b98d8c00a9db721f5e68b6d9cb88b62005d8a9"
+  },
+  "source_git_blob_shas": [
+    "10dc6e58c388e5d9b32fe239ef1a3118cf47c4c1",
+    "6da4af92cca0a2c0762e8f05f2d39d35ef7a201b",
+    "ef37cf92b4023467b751fc8e56fdc2ac668f6362",
+    "956f9d4d4245fe6c96729e5009bef90c7f7c2332",
+    "9d18deb14be445c982af7f8f9922486b593c8da4"
+  ],
+  "test_count": 81
+}

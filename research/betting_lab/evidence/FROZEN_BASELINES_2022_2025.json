@@ -1,0 +1,13 @@
+{
+ "data_status":"EXISTING_LEVLINE_RESEARCH_RESULTS_ONLY_NOT_NEW_BACKTEST",
+ "program":"LEVLINE_BETTING_LAB_B08_SPRINT",
+ "date":"2026-10-10",
+ "source":{"repository":"levine26/nfl-forecast-model","path":"research/levline3_chronological_accuracy_audit_v1.json","github_blob_sha":"e0334e1ca175561e9e551ebf88a19eea2933a3c6","link":"https://github.com/levine26/nfl-forecast-model/blob/main/research/levline3_chronological_accuracy_audit_v1.json"},
+ "historical_evidence_is_development_nonpristine":true,
+ "ml_first_year":2022,
+ "ml_2021":"NOT_AVAILABLE_AS_SAME_METHOD_CHRONOLOGICAL_OOF_FORECAST; NEVER_BACKFILL_WITH_RESULTS",
+ "ml_2022_2025":{"games":1087,"fst_correct":741,"market_correct":735,"fst_accuracy":0.6816927322907084,"market_accuracy":0.6761729530818767,"fst_brier":0.21065334840485694,"market_brier":0.2101992905677052,"fst_log_loss":0.6087126266444343,"market_log_loss":0.6076472081285538,
+ "seasons":[{"season":2022,"games":271,"fst_correct":182,"market_correct":178},{"season":2023,"games":272,"fst_correct":185,"market_correct":184},{"season":2024,"games":272,"fst_correct":195,"market_correct":195},{"season":2025,"games":272,"fst_correct":179,"market_correct":178}]},
+ "ats_preexisting_v1":{"reference":"research/ats-nextgen/PHASE3_EVIDENCE_SYNTHESIS.md","q1":"REJECTED","q2":"STRUCTURALLY_INVALID","q3":"REJECTED","q3_nonpush_hit_rate":0.521739,"market_null_nonpush_hit_rate":0.528355,"cannot_claim_price_aware_roi":true},
+ "totals_preexisting":{"independent_probabilistic_out_of_time_evaluation":"NOT_ESTABLISHED_IN_THIS_SPRINT","historical_wager_roi":"UNAVAILABLE"}
+}
