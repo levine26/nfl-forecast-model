@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 89,
-    "on_time": 50,
+    "on_time": 51,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1398,9 +1398,19 @@
       "minutes_late_vs_target": 0.8048,
       "scheduled_lock_utc": "2026-11-15T20:05:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-20T00:15:00.423070+00:00",
+      "classification": "on_time",
+      "game_id": "2026_11_IND_HOU",
+      "minutes_before_kickoff": 59.9929,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0071,
+      "scheduled_lock_utc": "2026-11-20T00:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 139,
+  "locked_count": 140,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
