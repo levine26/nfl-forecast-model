@@ -7,55 +7,55 @@
       "pick_delta_pp": -1.658164208783408
     },
     {
-      "game_id": "2026_11_PIT_PHI",
-      "largest_driver": "Market movement",
-      "pick": "PIT",
-      "pick_delta_pp": -1.186109295688692
-    },
-    {
       "game_id": "2026_05_BUF_LA",
       "largest_driver": "Market movement",
       "pick": "LA",
       "pick_delta_pp": 0.9960877503218168
+    },
+    {
+      "game_id": "2026_06_WAS_SF",
+      "largest_driver": "Market movement",
+      "pick": "SF",
+      "pick_delta_pp": -0.7037037747535946
     }
   ],
-  "generated_utc": "2026-11-21T20:30:32.101126+00:00",
+  "generated_utc": "2026-11-22T18:35:09.280692+00:00",
   "market_disagreements": [
     {
       "confidence": "High",
       "game_id": "2026_11_ARI_KC",
       "matchup": "ARI @ KC",
       "pick": "KC",
-      "pick_prob": 0.9163987384151904,
+      "pick_prob": 0.9100045805070793,
       "projected_score": "KC 29.4 \u2013 ARI 17.5",
-      "pure_market_gap_pp": 13.678740385154464
+      "pure_market_gap_pp": 13.08078751406292
     },
     {
       "confidence": "Solid",
       "game_id": "2026_11_NYJ_LAC",
       "matchup": "NYJ @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.6102697861056361,
+      "pick_prob": 0.6212605011634057,
       "projected_score": "LAC 21.6 \u2013 NYJ 22.2",
-      "pure_market_gap_pp": 11.751258259612186
+      "pure_market_gap_pp": 12.676158400655263
     },
     {
       "confidence": "High",
-      "game_id": "2026_11_LV_DEN",
-      "matchup": "LV @ DEN",
-      "pick": "DEN",
-      "pick_prob": 0.8373637370815916,
-      "projected_score": "DEN 28.4 \u2013 LV 19.2",
-      "pure_market_gap_pp": 11.598424701862232
+      "game_id": "2026_11_MIA_BUF",
+      "matchup": "MIA @ BUF",
+      "pick": "BUF",
+      "pick_prob": 0.919862859652461,
+      "projected_score": "BUF 29.4 \u2013 MIA 15.9",
+      "pure_market_gap_pp": 11.446896905003623
     }
   ],
   "most_uncertain": [
     {
-      "confidence": "Lean",
+      "confidence": "Coin Flip",
       "game_id": "2026_11_BAL_CAR",
       "matchup": "BAL @ CAR",
       "pick": "CAR",
-      "pick_prob": 0.551935061274252,
+      "pick_prob": 0.5380658251090229,
       "projected_score": "CAR 24.6 \u2013 BAL 21.5"
     },
     {
@@ -63,7 +63,7 @@
       "game_id": "2026_11_MIN_SF",
       "matchup": "MIN @ SF",
       "pick": "SF",
-      "pick_prob": 0.5810539958553015,
+      "pick_prob": 0.5870176196972016,
       "projected_score": "SF 26.6 \u2013 MIN 19.2"
     },
     {
@@ -71,34 +71,34 @@
       "game_id": "2026_11_NYJ_LAC",
       "matchup": "NYJ @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.6102697861056361,
+      "pick_prob": 0.6212605011634057,
       "projected_score": "LAC 21.6 \u2013 NYJ 22.2"
     }
   ],
   "strongest": [
     {
       "confidence": "High",
-      "game_id": "2026_11_ARI_KC",
-      "matchup": "ARI @ KC",
-      "pick": "KC",
-      "pick_prob": 0.9163987384151904,
-      "projected_score": "KC 29.4 \u2013 ARI 17.5"
-    },
-    {
-      "confidence": "High",
       "game_id": "2026_11_MIA_BUF",
       "matchup": "MIA @ BUF",
       "pick": "BUF",
-      "pick_prob": 0.9099666478126325,
+      "pick_prob": 0.919862859652461,
       "projected_score": "BUF 29.4 \u2013 MIA 15.9"
     },
     {
       "confidence": "High",
-      "game_id": "2026_11_LV_DEN",
-      "matchup": "LV @ DEN",
-      "pick": "DEN",
-      "pick_prob": 0.8373637370815916,
-      "projected_score": "DEN 28.4 \u2013 LV 19.2"
+      "game_id": "2026_11_ARI_KC",
+      "matchup": "ARI @ KC",
+      "pick": "KC",
+      "pick_prob": 0.9100045805070793,
+      "projected_score": "KC 29.4 \u2013 ARI 17.5"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_11_NO_CHI",
+      "matchup": "NO @ CHI",
+      "pick": "CHI",
+      "pick_prob": 0.8422709287415353,
+      "projected_score": "CHI 28.6 \u2013 NO 17.5"
     }
   ],
   "week": 11
