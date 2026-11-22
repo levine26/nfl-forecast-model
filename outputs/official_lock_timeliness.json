@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 96,
+    "late": 98,
     "on_time": 51,
     "premature": 0
   },
@@ -1478,9 +1478,29 @@
       "minutes_late_vs_target": 21.0327,
       "scheduled_lock_utc": "2026-11-22T17:00:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-22T20:45:48.016000+00:00",
+      "classification": "late",
+      "game_id": "2026_11_NYJ_LAC",
+      "minutes_before_kickoff": 19.1997,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 40.8003,
+      "scheduled_lock_utc": "2026-11-22T20:05:00+00:00",
+      "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-22T20:45:48.016000+00:00",
+      "classification": "late",
+      "game_id": "2026_11_LV_DEN",
+      "minutes_before_kickoff": 39.1997,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 20.8003,
+      "scheduled_lock_utc": "2026-11-22T20:25:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 147,
+  "locked_count": 149,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
