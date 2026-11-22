@@ -4,13 +4,15 @@
     "propline",
     "the_odds_api"
   ],
-  "due_pairs": 1,
+  "due_pairs": 7,
   "expected_request_cost": 1,
   "external_request_made": true,
   "historical_endpoint_used": false,
   "market_provider": "propline",
   "minimum_complete_books": 2,
-  "missed": [],
+  "missed": [
+    "2026_11_JAX_NYG:T-30m:event_identity_unresolved"
+  ],
   "phase": "PROSPECTIVE PHASE 2 \u2014 LIVE ACCUMULATION AND OPERATIONAL QUALIFICATION",
   "production_authorized": false,
   "production_changed": false,
@@ -21,8 +23,8 @@
   "quota_reserve": 50,
   "quota_used": 1,
   "reason": null,
-  "request_timestamp_utc": "2026-11-15T13:56:07.344433+00:00",
+  "request_timestamp_utc": "2026-11-22T17:24:12.444733+00:00",
   "research_only": true,
-  "rows_added_this_request": 70,
+  "rows_added_this_request": 428,
   "status": "captured"
 }

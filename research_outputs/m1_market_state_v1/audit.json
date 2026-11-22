@@ -1330,10 +1330,130 @@
       "reason": "missing_required_predictor_horizon",
       "schema_version": "levline-m1-market-state-v1",
       "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [
+        "T-30m"
+      ],
+      "available_predictor_horizons": [],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_11_ARI_KC",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [
+        "T-30m"
+      ],
+      "available_predictor_horizons": [],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_11_BAL_CAR",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [
+        "T-30m"
+      ],
+      "available_predictor_horizons": [],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_11_MIA_BUF",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [
+        "T-30m"
+      ],
+      "available_predictor_horizons": [],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_11_NO_CHI",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [
+        "T-30m"
+      ],
+      "available_predictor_horizons": [],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_11_TB_DET",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [
+        "T-30m"
+      ],
+      "available_predictor_horizons": [],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_11_TEN_DAL",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
     }
   ],
-  "games_seen": 52,
-  "ineligible_predictor_rows": 38,
+  "games_seen": 58,
+  "ineligible_predictor_rows": 44,
   "production_authorized": false,
   "program_id": "FV2-PROS-M1-MARKETSTATE-01",
   "schema_version": "levline-m1-market-state-v1"
