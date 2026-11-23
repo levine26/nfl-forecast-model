@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 98,
-    "on_time": 51,
+    "on_time": 52,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1498,9 +1498,19 @@
       "minutes_late_vs_target": 20.8003,
       "scheduled_lock_utc": "2026-11-22T20:25:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-23T00:20:00.200796+00:00",
+      "classification": "on_time",
+      "game_id": "2026_11_MIN_SF",
+      "minutes_before_kickoff": 59.9967,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 0.0033,
+      "scheduled_lock_utc": "2026-11-23T00:20:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 149,
+  "locked_count": 150,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
