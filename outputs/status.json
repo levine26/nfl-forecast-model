@@ -1,28 +1,28 @@
 {
-  "data_state": "2026 schedule/results/Elo + PBP/EPA live",
+  "status": "degraded",
   "expected_week_games": 13,
-  "final_probability_strategy": "F-ST-01-FROZEN-2026",
-  "fst_artifact_id": "F-ST-01-FROZEN-2026",
-  "fst_artifact_training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
-  "fst_fallback_count": 0,
-  "games": 12,
-  "generated_utc": "2026-11-23T00:19:05.308660+00:00",
-  "last_immutable_lock_update_utc": "2026-11-23T00:20:00.200796+00:00",
-  "locked_official_predictions": 150,
-  "market_available_games": 12,
-  "market_freshness_status_counts": {
-    "unknown": 12
-  },
-  "market_missing_or_invalid_games": 0,
-  "market_provenance_missing_games": 12,
-  "market_snapshot_source": null,
-  "market_snapshot_timestamp_utc": null,
   "missing_week_game_ids": [
     "2026_11_PIT_PHI"
   ],
-  "model_version": "0.9.0-fst",
-  "next_kickoff_utc": "2026-11-23T01:20:00+00:00",
-  "power_rating_teams": 32,
   "slate_completeness_verified": true,
-  "status": "degraded"
+  "generated_utc": "2026-11-23T03:57:44.049346+00:00",
+  "games": 12,
+  "locked_official_predictions": 150,
+  "power_rating_teams": 32,
+  "next_kickoff_utc": "2026-11-24T01:15:00+00:00",
+  "model_version": "0.9.0-fst",
+  "final_probability_strategy": "F-ST-01-FROZEN-2026",
+  "fst_artifact_id": "F-ST-01-FROZEN-2026",
+  "fst_artifact_training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+  "market_available_games": 12,
+  "market_missing_or_invalid_games": 0,
+  "market_provenance_missing_games": 11,
+  "fst_fallback_count": 0,
+  "market_snapshot_timestamp_utc": "2026-11-23T03:57:44.048147+00:00",
+  "market_snapshot_source": "nflverse_games.csv_moneyline",
+  "market_freshness_status_counts": {
+    "unknown": 11,
+    "refreshed_this_run": 1
+  },
+  "data_state": "2026 schedule/results/Elo + PBP/EPA live"
 }
