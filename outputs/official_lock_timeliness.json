@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 98,
-    "on_time": 52,
+    "on_time": 53,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1508,9 +1508,19 @@
       "minutes_late_vs_target": 0.0033,
       "scheduled_lock_utc": "2026-11-23T00:20:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-24T00:23:41.143932+00:00",
+      "classification": "on_time",
+      "game_id": "2026_11_CIN_WAS",
+      "minutes_before_kickoff": 51.3143,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 8.6857,
+      "scheduled_lock_utc": "2026-11-24T00:15:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 150,
+  "locked_count": 151,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
