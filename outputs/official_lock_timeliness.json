@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 98,
-    "on_time": 53,
+    "on_time": 54,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -1518,9 +1518,19 @@
       "minutes_late_vs_target": 8.6857,
       "scheduled_lock_utc": "2026-11-24T00:15:00+00:00",
       "target_minutes_before_kickoff": 60.0
+    },
+    {
+      "actual_lock_utc": "2026-11-26T20:32:34.122945+00:00",
+      "classification": "on_time",
+      "game_id": "2026_12_PHI_DAL",
+      "minutes_before_kickoff": 57.4313,
+      "minutes_late_vs_t120": null,
+      "minutes_late_vs_target": 2.5687,
+      "scheduled_lock_utc": "2026-11-26T20:30:00+00:00",
+      "target_minutes_before_kickoff": 60.0
     }
   ],
-  "locked_count": 151,
+  "locked_count": 152,
   "official_lock_target_minutes": null,
   "official_lock_targets_minutes": [
     60.0,
