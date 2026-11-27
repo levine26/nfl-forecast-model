@@ -3423,5 +3423,28 @@
       "The locked forecast got the winner direction right."
     ],
     "winner_correct": true
+  },
+  "2026_12_PHI_DAL": {
+    "actual_score": "DAL 38 \u2013 PHI 39",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "winner_miss",
+      "margin_miss",
+      "total_miss"
+    ],
+    "game_id": "2026_12_PHI_DAL",
+    "margin_abs_error": 7.605540046265869,
+    "matchup": "PHI @ DAL",
+    "official_home_prob": 0.7984975515073458,
+    "official_pick": "DAL",
+    "projected_score": "DAL 25.6 \u2013 PHI 19.0",
+    "total_abs_error": 32.4765780248054,
+    "what_missed": [
+      "The locked forecast missed the outright winner.",
+      "The predicted margin finished 7.6 points from the actual margin.",
+      "The predicted total finished 32.5 points from the actual total."
+    ],
+    "what_went_right": [],
+    "winner_correct": false
   }
 }
